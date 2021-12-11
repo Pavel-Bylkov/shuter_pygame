@@ -2,6 +2,28 @@ import pygame as pg
 
 # нам нужны такие картинки:
 img_back = "galaxy.jpg"  # фон игры
+img_hero = "rocket.png"  # герой
+
+
+class Hero:
+    def __init__(self):
+        self.x = 500
+        self.y = 400
+        self.image = pg.transform.scale(pg.image.load(img_hero), (60, 80))
+
+    def update(self):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_w]:
+            self.y -= 10
+        if keys[pg.K_s]:
+            self.y += 10
+        if keys[pg.K_a]:
+            self.x -= 10
+        if keys[pg.K_d]:
+            self.x += 10
+
+    def reset(self, win):
+        win.blit(self.image, (self.x, self.y))
 
 # запускаем инициализацию pygame - настройка на наше железо
 pg.init()
@@ -12,6 +34,10 @@ pg.display.set_caption("Shooter")  # Title у окна
 window = pg.display.set_mode((win_width, win_height))
 back_img = pg.image.load(img_back)  # конвертация любого формата изображений в формат pygame
 background = pg.transform.scale(back_img, (win_width, win_height))
+
+# создаем спрайты
+hero = Hero()
+
 
 # переменная "игра закончилась": как только там True,
 # в основном цикле перестают работать спрайты
@@ -25,10 +51,22 @@ while run:
     for e in pg.event.get():
         if e.type == pg.QUIT:
             run = False
+        # if e.type == pg.KEYDOWN:
+        #     if e.key == pg.K_w:
+        #         hero_y -= 10
+        #     if e.key == pg.K_s:
+        #         hero_y += 10
+        #     if e.key == pg.K_a:
+        #         hero_x -= 10
+        #     if e.key == pg.K_d:
+        #         hero_x += 10
 
     if not finish:
         # обновляем фон
         window.blit(background, (0, 0))
+
+        hero.update()
+        hero.reset(window)
 
         pg.display.update()
 
