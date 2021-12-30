@@ -66,7 +66,13 @@ gameover = pg.transform.scale(pg.image.load(img_over), (win_width, win_height))
 # создаем спрайты
 hero = Hero()
 
-monster = Enemy(x=win_width//2, y=0, speed=5)
+monsters = pg.sprite.Group()
+for k in range(5):
+    monsters.add(Enemy(x=random.randint(30, win_width - 30),
+                       y=random.randint(-500, -30),
+                       speed=random.randint(3, 7)))
+
+
 
 # переменная "игра закончилась": как только там True,
 # в основном цикле перестают работать спрайты
@@ -88,8 +94,8 @@ while run:
         hero.update()
         hero.reset(window)
 
-        monster.update()
-        monster.reset(window)
+        monsters.update()
+        monsters.draw(window)
 
         # window.blit(gameover, (0, 0))
 
@@ -97,4 +103,4 @@ while run:
 
     # цикл срабатывает каждую 0.05 секунд
     #time.delay(50)
-    clock.tick(40)
+    clock.tick(30)
