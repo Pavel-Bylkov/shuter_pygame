@@ -1,6 +1,8 @@
 import pygame as pg
 import random
 
+# todo Добавить режимы игры
+
 # нам нужны такие картинки:
 img_back = "galaxy.jpg"  # фон игры
 img_hero = "rocket.png"  # герой
@@ -62,11 +64,13 @@ window = pg.display.set_mode((win_width, win_height))
 back_img = pg.image.load(img_back)  # конвертация любого формата изображений в формат pygame
 background = pg.transform.scale(back_img, (win_width, win_height))
 
+# подготавливаем картинку для геймовера
 gameover = pg.transform.scale(pg.image.load(img_over), (win_width, win_height))
 
 # создаем спрайты
 hero = Hero()
 
+# чтобы работала группа, необходимо наследоваться от pg.sprite.Sprite
 monsters = pg.sprite.Group()
 for k in range(5):
     monsters.add(
@@ -100,7 +104,9 @@ while run:
         monsters.update()
         monsters.draw(window)
 
-        # window.blit(gameover, (0, 0))
+        if pg.sprite.spritecollide(hero, monsters, True):
+            window.blit(gameover, (0, 0))
+            finish = True
 
         pg.display.update()
 
