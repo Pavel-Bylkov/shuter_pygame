@@ -5,6 +5,7 @@ import random
 img_back = "galaxy.jpg"  # фон игры
 img_hero = "rocket.png"  # герой
 img_enemy = "ufo.png"  # враг
+img_over = "gameover.jpeg"
 win_width, win_height = 1200, 800
 
 
@@ -55,6 +56,8 @@ window = pg.display.set_mode((win_width, win_height))
 back_img = pg.image.load(img_back)  # конвертация любого формата изображений в формат pygame
 background = pg.transform.scale(back_img, (win_width, win_height))
 
+gameover = pg.transform.scale(pg.image.load(img_over), (win_width, win_height))
+
 # создаем спрайты
 hero = Hero()
 
@@ -82,6 +85,8 @@ while run:
 
         monster.update()
         monster.reset(window)
+
+        # window.blit(gameover, (0, 0))
 
         pg.display.update()
 
