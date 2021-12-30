@@ -2,6 +2,8 @@ import pygame as pg
 import random
 
 # todo Добавить режимы игры
+# Todo Добавить взрывы и стрельбу
+# todo Добавить вывод информации на экран - текст
 
 # нам нужны такие картинки:
 img_back = "galaxy.jpg"  # фон игры
@@ -19,7 +21,6 @@ class Hero(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 500
         self.rect.y = 400
-        
 
     def update(self):
         keys = pg.key.get_pressed()
@@ -78,7 +79,6 @@ for k in range(5):
               y=random.randint(-500, -30),
               speed=random.randint(3, 7))
     )
-
 
 
 # переменная "игра закончилась": как только там True,
