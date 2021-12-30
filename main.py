@@ -72,15 +72,6 @@ while run:
     for e in pg.event.get():
         if e.type == pg.QUIT:
             run = False
-        # if e.type == pg.KEYDOWN:
-        #     if e.key == pg.K_w:
-        #         hero_y -= 10
-        #     if e.key == pg.K_s:
-        #         hero_y += 10
-        #     if e.key == pg.K_a:
-        #         hero_x -= 10
-        #     if e.key == pg.K_d:
-        #         hero_x += 10
 
     if not finish:
         # обновляем фон
