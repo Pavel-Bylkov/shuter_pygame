@@ -9,43 +9,48 @@ img_over = "gameover.jpeg"
 win_width, win_height = 1200, 800
 
 
-class Hero:
+class Hero(pg.sprite.Sprite):
     def __init__(self):
-        self.x = 500
-        self.y = 400
+        super().__init__()
         self.image = pg.transform.scale(pg.image.load(img_hero), (60, 80))
+        self.rect = self.image.get_rect()
+        self.rect.x = 500
+        self.rect.y = 400
+        
 
     def update(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
-            self.y -= 10
+            self.rect.y -= 10
         if keys[pg.K_s]:
-            self.y += 10
+            self.rect.y += 10
         if keys[pg.K_a]:
-            self.x -= 10
+            self.rect.x -= 10
         if keys[pg.K_d]:
-            self.x += 10
+            self.rect.x += 10
 
     def reset(self, win):
-        win.blit(self.image, (self.x, self.y))
+        win.blit(self.image, (self.rect.x, self.rect.y))
 
 
-class Enemy:
+class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y, speed):
-        self.x = x
-        self.y = y
+        super().__init__()
         self.speed = speed
         self.image = pg.transform.scale(pg.image.load(img_enemy), (70, 50))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
     def update(self):
-        self.y += self.speed
-        self.x += random.randint(-self.speed, self.speed)
-        if self.y > win_height:
-            self.y = -50
-            self.x = random.randint(30, win_height - 30)
+        self.rect.y += self.speed
+        self.rect.x += random.randint(-self.speed, self.speed)
+        if self.rect.y > win_height:
+            self.rect.y = -50
+            self.rect.x = random.randint(30, win_height - 30)
 
     def reset(self, win):
-        win.blit(self.image, (self.x, self.y))
+        win.blit(self.image, (self.rect.x, self.rect.y))
 
 # запускаем инициализацию pygame - настройка на наше железо
 pg.init()
