@@ -12,6 +12,7 @@ win_width, win_height = 1200, 800
 class Hero(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
+        self.speed = 12
         self.image = pg.transform.scale(pg.image.load(img_hero), (60, 80))
         self.rect = self.image.get_rect()
         self.rect.x = 500
@@ -21,13 +22,13 @@ class Hero(pg.sprite.Sprite):
     def update(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
-            self.rect.y -= 10
+            self.rect.y -= self.speed
         if keys[pg.K_s]:
-            self.rect.y += 10
+            self.rect.y += self.speed
         if keys[pg.K_a]:
-            self.rect.x -= 10
+            self.rect.x -= self.speed
         if keys[pg.K_d]:
-            self.rect.x += 10
+            self.rect.x += self.speed
 
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
@@ -68,9 +69,11 @@ hero = Hero()
 
 monsters = pg.sprite.Group()
 for k in range(5):
-    monsters.add(Enemy(x=random.randint(30, win_width - 30),
-                       y=random.randint(-500, -30),
-                       speed=random.randint(3, 7)))
+    monsters.add(
+        Enemy(x=random.randint(3, win_width // 10 - 3) * 10,
+              y=random.randint(-500, -30),
+              speed=random.randint(3, 7))
+    )
 
 
 
