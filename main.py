@@ -4,6 +4,9 @@ import random
 # todo Добавить режимы игры
 # Todo Добавить взрывы и стрельбу
 # todo Добавить вывод информации на экран - текст
+#ToDo make it so that when rocket and ufo interact the ufo
+# disappears and u get point not u lose game
+
 
 # запускаем инициализацию pygame - настройка на наше железо
 pg.init()
