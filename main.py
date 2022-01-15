@@ -5,12 +5,24 @@ import random
 # Todo Добавить взрывы и стрельбу
 # todo Добавить вывод информации на экран - текст
 
+# запускаем инициализацию pygame - настройка на наше железо
+pg.init()
+pg.font.init()
+
 # нам нужны такие картинки:
 img_back = "galaxy.jpg"  # фон игры
 img_hero = "rocket.png"  # герой
 img_enemy = "ufo.png"  # враг
 img_over = "gameover.jpeg"
 win_width, win_height = 1200, 800
+
+# цвета
+WHITE_COLOR = (255, 255, 255)
+BLACK_COLOR = (0, 0, 0)
+RED_COLOR = (255, 0, 0)
+GREEN_COLOR = (0, 255, 0)
+BLUE_COLOR = (0, 0, 255)
+YELLOW_COLOR = (255, 255, 0)
 
 
 class Hero(pg.sprite.Sprite):
@@ -56,8 +68,7 @@ class Enemy(pg.sprite.Sprite):
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
 
-# запускаем инициализацию pygame - настройка на наше железо
-pg.init()
+
 
 # Создаем окошко
 pg.display.set_caption("Shooter")  # Title у окна
@@ -67,6 +78,12 @@ background = pg.transform.scale(back_img, (win_width, win_height))
 
 # подготавливаем картинку для геймовера
 gameover = pg.transform.scale(pg.image.load(img_over), (win_width, win_height))
+
+
+# создаем шрифт
+font_temp = pg.font.Font(None, 150)
+# Картинка из шрифта
+text = font_temp.render("Test", 1, WHITE_COLOR)
 
 # создаем спрайты
 hero = Hero()
@@ -107,6 +124,8 @@ while run:
         if pg.sprite.spritecollide(hero, monsters, True):
             window.blit(gameover, (0, 0))
             finish = True
+
+        window.blit(text, (200, 50))
 
         pg.display.update()
 
