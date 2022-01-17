@@ -28,6 +28,29 @@ BLUE_COLOR = (0, 0, 255)
 YELLOW_COLOR = (255, 255, 0)
 
 
+class Text:
+    def __init__(self, x, y, font=None, font_size=50, text="Test", color=WHITE_COLOR):
+        # создаем шрифт
+        self.font = pg.font.Font(font, font_size)
+        # Картинка из шрифта
+        self.color = color
+        self.image = self.font.render(text, 1, self.color)
+        self.x = x
+        self.y = y
+
+    def update(self, text):
+        self.image = self.font.render(text, 1, self.color)
+
+    def change_color(self, new_color):
+        self.color = new_color
+
+    def change_pos(self, x, y):
+        self.x = x
+        self.y = y
+
+    def reset(self, win):
+        win.blit(self.image, (self.x, self.y))
+
 class Hero(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -82,14 +105,15 @@ background = pg.transform.scale(back_img, (win_width, win_height))
 # подготавливаем картинку для геймовера
 gameover = pg.transform.scale(pg.image.load(img_over), (win_width, win_height))
 
-
-# создаем шрифт
-font_temp = pg.font.Font(None, 150)
-# Картинка из шрифта
-text = font_temp.render("Test", 1, WHITE_COLOR)
-
 # создаем спрайты
 hero = Hero()
+
+# создаем надписи на экране
+score_display = Text(x=20, y=30, text="Score: 0", font_size=30)
+score = 0
+
+lives_display = Text(x=20, y=60, text="Lives: 3", font_size=30)
+lives = 3
 
 # чтобы работала группа, необходимо наследоваться от pg.sprite.Sprite
 monsters = pg.sprite.Group()
@@ -124,11 +148,14 @@ while run:
         monsters.update()
         monsters.draw(window)
 
+        score_display.update(f"Score: {score}")
+        score_display.reset(window)
+        lives_display.update(f"Lives: {lives}")
+        lives_display.reset(window)
+
         if pg.sprite.spritecollide(hero, monsters, True):
             window.blit(gameover, (0, 0))
             finish = True
-
-        window.blit(text, (200, 50))
 
         pg.display.update()
 
