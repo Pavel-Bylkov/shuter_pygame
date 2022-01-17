@@ -3,7 +3,6 @@ import random
 
 # todo Добавить режимы игры
 # Todo Добавить взрывы и стрельбу
-# todo Добавить вывод информации на экран - текст
 #ToDo make it so that when rocket and ufo interact the ufo
 # disappears and u get point not u lose game
 
@@ -150,13 +149,17 @@ while run:
         monsters.update()
         monsters.draw(window)
 
+        if pg.sprite.spritecollide(hero, monsters, True):
+            lives -= 1
+
+        if lives == 1:
+            lives_display.change_color(RED_COLOR)
+
         score_display.update(f"Score: {score}")
         score_display.reset(window)
         lives_display.update(f"Lives: {lives}")
         lives_display.reset(window)
 
-        if pg.sprite.spritecollide(hero, monsters, True) and :
-            lives -= 1
 
         if lives == 0:
             window.blit(gameover, (0, 0))
