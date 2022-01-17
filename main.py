@@ -85,11 +85,13 @@ class Enemy(pg.sprite.Sprite):
         self.rect.y = y
 
     def update(self):
+        global lives
         self.rect.y += self.speed
         self.rect.x += random.randint(-self.speed, self.speed)
         if self.rect.y > win_height:
             self.rect.y = -50
             self.rect.x = random.randint(30, win_height - 30)
+            lives -= 1
 
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
@@ -153,7 +155,10 @@ while run:
         lives_display.update(f"Lives: {lives}")
         lives_display.reset(window)
 
-        if pg.sprite.spritecollide(hero, monsters, True):
+        if pg.sprite.spritecollide(hero, monsters, True) and :
+            lives -= 1
+
+        if lives == 0:
             window.blit(gameover, (0, 0))
             finish = True
 
