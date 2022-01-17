@@ -50,6 +50,7 @@ class Text:
     def reset(self, win):
         win.blit(self.image, (self.x, self.y))
 
+
 class Hero(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -90,7 +91,8 @@ class Enemy(pg.sprite.Sprite):
         if self.rect.y > win_height:
             self.rect.y = -50
             self.rect.x = random.randint(30, win_height - 30)
-            lives -= 1
+            if lives > 0:
+                lives -= 1
 
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
@@ -149,7 +151,7 @@ while run:
         monsters.update()
         monsters.draw(window)
 
-        if pg.sprite.spritecollide(hero, monsters, True):
+        if pg.sprite.spritecollide(hero, monsters, True) and lives > 0:
             lives -= 1
 
         if lives == 1:
@@ -159,7 +161,6 @@ while run:
         score_display.reset(window)
         lives_display.update(f"Lives: {lives}")
         lives_display.reset(window)
-
 
         if lives == 0:
             window.blit(gameover, (0, 0))
