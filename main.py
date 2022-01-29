@@ -75,7 +75,7 @@ class Hero(pg.sprite.Sprite):
             self.rect.x -= self.speed
         if keys[pg.K_d]:
             self.rect.x += self.speed
-        if keys[pg.K_SPACE] and time.time() - self.reload > 0.5:
+        if keys[pg.K_SPACE] and time.time() - self.reload > 0.3:
             self.bullets.add(
                 Bullet(x=self.rect.centerx, y=self.rect.top, speed=10)
             )
@@ -95,8 +95,8 @@ class Enemy(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-    def update(self):
-        global lives
+    def update(self, player):
+        global lives, score
         self.rect.y += self.speed
         self.rect.x += random.randint(-self.speed, self.speed)
         if self.rect.y > win_height:
@@ -104,6 +104,10 @@ class Enemy(pg.sprite.Sprite):
             self.rect.x = random.randint(30, win_height - 30)
             if lives > 0:
                 lives -= 1
+        if pg.sprite.spritecollide(self, player.bullets, True):
+            self.rect.y = -50
+            self.rect.x = random.randint(30, win_height - 30)
+            score += 1
 
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
