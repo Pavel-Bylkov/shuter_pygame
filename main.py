@@ -1,5 +1,6 @@
 import pygame as pg
 import random
+import time
 
 # todo Добавить режимы игры
 # Todo Добавить взрывы и стрельбу
@@ -59,8 +60,9 @@ class Hero(pg.sprite.Sprite):
         self.image = pg.transform.scale(pg.image.load(img_hero), (60, 80))
         self.rect = self.image.get_rect()
         self.rect.x = 500
-        self.rect.y = 400
+        self.rect.y = 700
         self.bullets = pg.sprite.Group()
+        self.reload = time.time()
 
     def update(self):
         self.bullets.update()
@@ -73,10 +75,11 @@ class Hero(pg.sprite.Sprite):
             self.rect.x -= self.speed
         if keys[pg.K_d]:
             self.rect.x += self.speed
-        if keys[pg.K_SPACE]:
+        if keys[pg.K_SPACE] and time.time() - self.reload > 0.5:
             self.bullets.add(
                 Bullet(x=self.rect.centerx, y=self.rect.top, speed=10)
             )
+            self.reload = time.time()
 
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
