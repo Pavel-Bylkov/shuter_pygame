@@ -179,7 +179,7 @@ while run:
         hero.update()
         hero.reset(window)
 
-        monsters.update()
+        monsters.update(hero)
         monsters.draw(window)
 
         if pg.sprite.spritecollide(hero, monsters, True) and lives > 0:
