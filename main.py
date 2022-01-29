@@ -16,6 +16,7 @@ img_back = "galaxy.jpg"  # фон игры
 img_hero = "rocket.png"  # герой
 img_enemy = "ufo.png"  # враг
 img_over = "gameover.jpeg"
+img_bull = "blaster.png"
 win_width, win_height = 1200, 800
 
 # цвета
@@ -59,8 +60,10 @@ class Hero(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 500
         self.rect.y = 400
+        self.bullets = pg.sprite.Group()
 
     def update(self):
+        self.bullets.update()
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
             self.rect.y -= self.speed
@@ -70,9 +73,14 @@ class Hero(pg.sprite.Sprite):
             self.rect.x -= self.speed
         if keys[pg.K_d]:
             self.rect.x += self.speed
+        if keys[pg.K_SPACE]:
+            self.bullets.add(
+                Bullet(x=self.rect.centerx, y=self.rect.top, speed=10)
+            )
 
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
+        self.bullets.draw(win)
 
 
 class Enemy(pg.sprite.Sprite):
@@ -98,6 +106,22 @@ class Enemy(pg.sprite.Sprite):
         win.blit(self.image, (self.rect.x, self.rect.y))
 
 
+class Bullet(pg.sprite.Sprite):
+    def __init__(self, x, y, speed):
+        super().__init__()
+        self.speed = speed
+        self.image = pg.transform.scale(pg.image.load(img_bull), (10, 5))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self):
+        self.rect.y -= self.speed
+        if self.rect.y < 0:
+            self.kill()
+
+    def reset(self, win):
+        win.blit(self.image, (self.rect.x, self.rect.y))
 
 # Создаем окошко
 pg.display.set_caption("Shooter")  # Title у окна
