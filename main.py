@@ -7,7 +7,7 @@ import time
 #ToDo make it so that when rocket and ufo interact the ufo
 # disappears and u get point not u lose game
 
-
+FPS = 35
 # запускаем инициализацию pygame - настройка на наше железо
 pg.init()
 pg.font.init()
@@ -17,7 +17,8 @@ img_back = "galaxy.jpg"  # фон игры
 img_hero = "rocket.png"  # герой
 img_enemy = "ufo.png"  # враг
 img_over = "gameover.jpeg"
-img_bull = "blaster.png"
+img_bull = "fireball.png"
+img_bum = "Взрыв4.png"
 win_width, win_height = 1200, 800
 
 # цвета
@@ -27,6 +28,13 @@ RED_COLOR = (255, 0, 0)
 GREEN_COLOR = (0, 255, 0)
 BLUE_COLOR = (0, 0, 255)
 YELLOW_COLOR = (255, 255, 0)
+
+
+images_for_bum = []
+for i in range(1, 11):
+    images_for_bum.append(
+        pg.transform.scale(pg.image.load(img_bum), (i * 10, i * 10))
+    )
 
 
 class Text:
@@ -75,7 +83,7 @@ class Hero(pg.sprite.Sprite):
             self.rect.x -= self.speed
         if keys[pg.K_d]:
             self.rect.x += self.speed
-        if keys[pg.K_SPACE] and time.time() - self.reload > 0.3:
+        if keys[pg.K_SPACE] and time.time() - self.reload > 0.25:
             self.bullets.add(
                 Bullet(x=self.rect.centerx, y=self.rect.top, speed=10)
             )
@@ -95,7 +103,7 @@ class Enemy(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-    def update(self, player):
+    def update(self, player, bums):
         global lives, score
         self.rect.y += self.speed
         self.rect.x += random.randint(-self.speed, self.speed)
@@ -105,6 +113,9 @@ class Enemy(pg.sprite.Sprite):
             if lives > 0:
                 lives -= 1
         if pg.sprite.spritecollide(self, player.bullets, True):
+            bums.add(
+                Bum(self.rect.centerx, self.rect.centery)
+            )
             self.rect.y = -50
             self.rect.x = random.randint(30, win_height - 30)
             score += 1
@@ -126,6 +137,31 @@ class Bullet(pg.sprite.Sprite):
         self.rect.y -= self.speed
         if self.rect.y < 0:
             self.kill()
+
+    def reset(self, win):
+        win.blit(self.image, (self.rect.x, self.rect.y))
+
+
+class Bum(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = images_for_bum[0]
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.centery = y
+        self.count = 0
+
+    def update(self):
+        self.count += 1
+        if self.count == 10:
+            self.kill()
+        else:
+            x = self.rect.centerx
+            y = self.rect.centery
+            self.image = images_for_bum[self.count]
+            self.rect = self.image.get_rect()
+            self.rect.centerx = x
+            self.rect.centery = y
 
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
@@ -158,6 +194,7 @@ for k in range(5):
               speed=random.randint(3, 7))
     )
 
+bums = pg.sprite.Group()
 
 # переменная "игра закончилась": как только там True,
 # в основном цикле перестают работать спрайты
@@ -179,8 +216,11 @@ while run:
         hero.update()
         hero.reset(window)
 
-        monsters.update(hero)
+        monsters.update(hero, bums)
         monsters.draw(window)
+
+        bums.update()
+        bums.draw(window)
 
         if pg.sprite.spritecollide(hero, monsters, True) and lives > 0:
             lives -= 1
@@ -201,4 +241,4 @@ while run:
 
     # цикл срабатывает каждую 0.05 секунд
     #time.delay(50)
-    clock.tick(30)
+    clock.tick(FPS)
