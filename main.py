@@ -2,8 +2,7 @@ import pygame as pg
 import random
 import time
 
-# todo Добавить режимы игры
-# Todo Добавить взрывы и стрельбу
+# todo Добавить режимы игр
 #ToDo make it so that when rocket and ufo interact the ufo
 # disappears and u get point not u lose game
 
