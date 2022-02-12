@@ -5,20 +5,30 @@ import time
 # todo Добавить режимы игр
 #ToDo make it so that when rocket and ufo interact the ufo
 # disappears and u get point not u lose game
+# todo add different gun by power
 
 FPS = 35
 # запускаем инициализацию pygame - настройка на наше железо
 pg.init()
 pg.font.init()
 
+win_width, win_height = 1200, 800
 # нам нужны такие картинки:
 img_back = "galaxy.jpg"  # фон игры
-img_hero = "rocket.png"  # герой
-img_enemy = "ufo.png"  # враг
-img_over = "gameover.jpeg"
-img_bull = "fireball.png"
+# конвертация любого формата изображений в формат pygame
+back_img = pg.image.load(img_back)
+background = pg.transform.scale(back_img, (win_width, win_height))
+img_hero = pg.transform.scale(pg.image.load("rocket.png"), (60, 80))  # герой
+img_enemy = pg.transform.scale(pg.image.load("ufo.png"), (70, 50))  # враг
+# подготавливаем картинку для геймовера
+gameover = pg.transform.scale(pg.image.load("gameover.jpeg"), (win_width, win_height))
+img_bull = pg.transform.scale(pg.image.load("fireball.png"), (10, 5))
 img_bum = "Взрыв4.png"
-win_width, win_height = 1200, 800
+images_for_bum = []
+for i in range(1, 11):
+    images_for_bum.append(
+        pg.transform.scale(pg.image.load(img_bum), (i * 10, i * 10))
+    )
 
 # цвета
 WHITE_COLOR = (255, 255, 255)
@@ -27,13 +37,6 @@ RED_COLOR = (255, 0, 0)
 GREEN_COLOR = (0, 255, 0)
 BLUE_COLOR = (0, 0, 255)
 YELLOW_COLOR = (255, 255, 0)
-
-
-images_for_bum = []
-for i in range(1, 11):
-    images_for_bum.append(
-        pg.transform.scale(pg.image.load(img_bum), (i * 10, i * 10))
-    )
 
 
 class Text:
@@ -59,15 +62,21 @@ class Text:
     def reset(self, win):
         win.blit(self.image, (self.x, self.y))
 
-
-class Hero(pg.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.speed = 12
-        self.image = pg.transform.scale(pg.image.load(img_hero), (60, 80))
+class Base(pg.sprite.Sprite):
+    def __init__(self, x, y, speed, img, *args, **kwargs):
+        super().__init__(*args)
+        self.speed = speed
+        self.image = img
         self.rect = self.image.get_rect()
-        self.rect.x = 500
-        self.rect.y = 700
+        self.rect.x = x
+        self.rect.y = y
+
+    def reset(self, win):
+        win.blit(self.image, (self.rect.x, self.rect.y))
+
+class Hero(Base):
+    def __init__(self, x, y, speed):
+        super().__init__(x=x, y=y, speed=speed, img=img_hero)
         self.bullets = pg.sprite.Group()
         self.reload = time.time()
 
@@ -89,18 +98,12 @@ class Hero(pg.sprite.Sprite):
             self.reload = time.time()
 
     def reset(self, win):
-        win.blit(self.image, (self.rect.x, self.rect.y))
+        super().reset(win)
         self.bullets.draw(win)
 
-
-class Enemy(pg.sprite.Sprite):
+class Enemy(Base):
     def __init__(self, x, y, speed):
-        super().__init__()
-        self.speed = speed
-        self.image = pg.transform.scale(pg.image.load(img_enemy), (70, 50))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        super().__init__(x=x, y=y, speed=speed, img=img_enemy)
 
     def update(self, player, bums):
         global lives, score
@@ -119,27 +122,14 @@ class Enemy(pg.sprite.Sprite):
             self.rect.x = random.randint(30, win_height - 30)
             score += 1
 
-    def reset(self, win):
-        win.blit(self.image, (self.rect.x, self.rect.y))
-
-
-class Bullet(pg.sprite.Sprite):
+class Bullet(Base):
     def __init__(self, x, y, speed):
-        super().__init__()
-        self.speed = speed
-        self.image = pg.transform.scale(pg.image.load(img_bull), (10, 5))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        super().__init__(x=x, y=y, speed=speed, img=img_bull)
 
     def update(self):
         self.rect.y -= self.speed
         if self.rect.y < 0:
             self.kill()
-
-    def reset(self, win):
-        win.blit(self.image, (self.rect.x, self.rect.y))
-
 
 class Bum(pg.sprite.Sprite):
     def __init__(self, x, y):
@@ -168,14 +158,9 @@ class Bum(pg.sprite.Sprite):
 # Создаем окошко
 pg.display.set_caption("Shooter")  # Title у окна
 window = pg.display.set_mode((win_width, win_height))
-back_img = pg.image.load(img_back)  # конвертация любого формата изображений в формат pygame
-background = pg.transform.scale(back_img, (win_width, win_height))
-
-# подготавливаем картинку для геймовера
-gameover = pg.transform.scale(pg.image.load(img_over), (win_width, win_height))
 
 # создаем спрайты
-hero = Hero()
+hero = Hero(x=500, y=700, speed=12)
 
 # создаем надписи на экране
 score_display = Text(x=20, y=30, text="Score: 0", font_size=30)
