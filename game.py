@@ -18,8 +18,10 @@ img_back = "galaxy.jpg"  # фон игры
 # конвертация любого формата изображений в формат pygame
 back_img = pg.image.load(img_back)
 background = pg.transform.scale(back_img, (win_width, win_height))
-img_hero = pg.transform.scale(pg.image.load("rocket.png"), (60, 80))  # герой
-img_enemy = pg.transform.scale(pg.image.load("ufo.png"), (70, 50))  # враг
+# герой
+img_hero = pg.transform.scale(pg.image.load("rocket.png"), (60, 80))
+# враг
+img_enemy = pg.transform.scale(pg.image.load("ufo.png"), (70, 50))
 # подготавливаем картинку для геймовера
 gameover = pg.transform.scale(pg.image.load("gameover.jpeg"), (win_width, win_height))
 img_bull = pg.transform.scale(pg.image.load("fireball.png"), (10, 5))
