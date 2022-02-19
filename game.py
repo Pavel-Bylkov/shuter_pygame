@@ -127,6 +127,12 @@ class Enemy(Base):
                 lives -= 1
         if pg.sprite.collide_rect(self, player):
             player.get_hit()
+            bums.add(
+                Bum(self.rect.centerx, self.rect.centery)
+            )
+            self.rect.y = -50
+            self.rect.x = random.randint(30, win_height - 30)
+            score += 1
         if pg.sprite.spritecollide(self, player.bullets, True):
             bums.add(
                 Bum(self.rect.centerx, self.rect.centery)
