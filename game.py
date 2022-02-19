@@ -24,7 +24,7 @@ img_hero = pg.transform.scale(pg.image.load("rocket.png"), (60, 80))
 img_enemy = pg.transform.scale(pg.image.load("ufo.png"), (70, 50))
 # подготавливаем картинку для геймовера
 gameover = pg.transform.scale(pg.image.load("gameover.jpeg"), (win_width, win_height))
-img_bull = pg.transform.scale(pg.image.load("fireball.png"), (10, 5))
+img_bull = pg.transform.scale(pg.image.load("fireball.png"), (30, 30))
 img_bum = "Взрыв4.png"
 images_for_bum = []
 for i in range(1, 11):
@@ -81,9 +81,12 @@ class Hero(Base):
         super().__init__(x=x, y=y, speed=speed, img=img_hero)
         self.bullets = pg.sprite.Group()
         self.reload = time.time()
+        self.health = 3
+        self.health_display = Text(x=20, y=90, text="Health: 3", font_size=30)
 
     def update(self):
         self.bullets.update()
+        self.health_display.update(f"Health: {self.health}")
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
             self.rect.y -= self.speed
@@ -99,9 +102,15 @@ class Hero(Base):
             )
             self.reload = time.time()
 
+    def get_hit(self):
+        self.health -= 1
+        if self.health == 0:
+            game_over()
+
     def reset(self, win):
         super().reset(win)
         self.bullets.draw(win)
+        self.health_display.reset(win)
 
 class Enemy(Base):
     def __init__(self, x, y, speed):
@@ -116,6 +125,8 @@ class Enemy(Base):
             self.rect.x = random.randint(30, win_height - 30)
             if lives > 0:
                 lives -= 1
+        if pg.sprite.collide_rect(self, player):
+            player.get_hit()
         if pg.sprite.spritecollide(self, player.bullets, True):
             bums.add(
                 Bum(self.rect.centerx, self.rect.centery)
@@ -157,6 +168,12 @@ class Bum(pg.sprite.Sprite):
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
 
+def game_over():
+    global finish
+
+    finish = True
+    window.blit(gameover, (0, 0))
+
 # Создаем окошко
 pg.display.set_caption("Shooter")  # Title у окна
 window = pg.display.set_mode((win_width, win_height))
@@ -175,7 +192,7 @@ lives = 3
 monsters = pg.sprite.Group()
 for k in range(5):
     monsters.add(
-        Enemy(x=random.randint(3, win_width // 10 - 3) * 10,
+        Enemy(x=random.randint(3, win_width // 10 - 4) * 10,
               y=random.randint(-500, -30),
               speed=random.randint(3, 7))
     )
@@ -220,8 +237,7 @@ while run:
         lives_display.reset(window)
 
         if lives == 0:
-            window.blit(gameover, (0, 0))
-            finish = True
+            game_over()
 
         pg.display.update()
 
