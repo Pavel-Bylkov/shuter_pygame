@@ -3,9 +3,11 @@ import random
 import time
 
 # todo Добавить режимы игр
-#ToDo make it so that when rocket and ufo interact the ufo
+# ToDo make it so that when rocket and ufo interact the ufo
 # disappears and u get point not u lose game
-# todo add different gun by power
+# todo add give many and pay upgrades
+# todo add levels and boss
+# todo diff enemys and boss
 
 FPS = 20
 # запускаем инициализацию pygame - настройка на наше железо
@@ -82,8 +84,8 @@ class Hero(Base):
         super().__init__(x=x, y=y, speed=speed, img=img_hero)
         self.bullets = pg.sprite.Group()
         self.reload = time.time()
-        self.health = 3
-        self.health_display = Text(x=20, y=90, text="Health: 3", font_size=30)
+        self.health = 10
+        self.health_display = Text(x=20, y=90, text="Health: 10", font_size=30)
         self.cur_weapon = 1
         # 1 - blaster, 2 - fireball
 
@@ -224,7 +226,7 @@ score_display = Text(x=20, y=30, text="Score: 0", font_size=30)
 score = 0
 
 lives_display = Text(x=20, y=60, text="Lives: 3", font_size=30)
-lives = 3
+lives = 10
 
 # чтобы работала группа, необходимо наследоваться от pg.sprite.Sprite
 monsters = pg.sprite.Group()
