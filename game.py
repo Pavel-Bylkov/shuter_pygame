@@ -7,7 +7,7 @@ import time
 # disappears and u get point not u lose game
 # todo add different gun by power
 
-FPS = 35
+FPS = 20
 # запускаем инициализацию pygame - настройка на наше железо
 pg.init()
 pg.font.init()
@@ -115,11 +115,14 @@ class Hero(Base):
 class Enemy(Base):
     def __init__(self, x, y, speed):
         super().__init__(x=x, y=y, speed=speed, img=img_enemy)
+        self.health = 3
+        self.health_display = Text(x=self.rect.x, y=(self.rect.y-15), text="3/3", font_size=20)
 
-    def update(self, player, bums):
+    def update(self, player, bums, win):
         global lives, score
         self.rect.y += self.speed
         self.rect.x += random.randint(-self.speed, self.speed)
+        self.health_display.change_pos(self.rect.x, self.rect.y - 15)
         if self.rect.y > win_height:
             self.rect.y = -50
             self.rect.x = random.randint(30, win_height - 30)
@@ -134,12 +137,19 @@ class Enemy(Base):
             self.rect.x = random.randint(30, win_height - 30)
             score += 1
         if pg.sprite.spritecollide(self, player.bullets, True):
+            self.health -= 1
+        if self.health == 0:
             bums.add(
                 Bum(self.rect.centerx, self.rect.centery)
             )
             self.rect.y = -50
             self.rect.x = random.randint(30, win_height - 30)
             score += 1
+            self.health = 3
+        self.health_display.update(f"{self.health}/3")
+        self.health_display.reset(win)
+
+
 
 class Bullet(Base):
     def __init__(self, x, y, speed):
@@ -225,7 +235,7 @@ while run:
         hero.update()
         hero.reset(window)
 
-        monsters.update(hero, bums)
+        monsters.update(hero, bums, window)
         monsters.draw(window)
 
         bums.update()
