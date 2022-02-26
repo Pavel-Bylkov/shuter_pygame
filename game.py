@@ -24,7 +24,8 @@ img_hero = pg.transform.scale(pg.image.load("rocket.png"), (60, 80))
 img_enemy = pg.transform.scale(pg.image.load("ufo.png"), (70, 50))
 # подготавливаем картинку для геймовера
 gameover = pg.transform.scale(pg.image.load("gameover.jpeg"), (win_width, win_height))
-img_bull = pg.transform.scale(pg.image.load("fireball.png"), (30, 30))
+img_bull = pg.transform.scale(pg.image.load("fireball.png"), (15, 15))
+img_bull2 = pg.transform.scale(pg.image.load("blaster.png"), (15, 15))
 img_bum = "Взрыв4.png"
 images_for_bum = []
 for i in range(1, 11):
@@ -83,6 +84,13 @@ class Hero(Base):
         self.reload = time.time()
         self.health = 3
         self.health_display = Text(x=20, y=90, text="Health: 3", font_size=30)
+        self.cur_weapon = 1  # 1 - blaster, 2 - fireball
+
+    def change_weapon(self):
+        if self.cur_weapon == 1:
+            self.cur_weapon = 2
+        else:
+            self.cur_weapon = 1
 
     def update(self):
         self.bullets.update()
@@ -96,11 +104,20 @@ class Hero(Base):
             self.rect.x -= self.speed
         if keys[pg.K_d]:
             self.rect.x += self.speed
-        if keys[pg.K_SPACE] and time.time() - self.reload > 0.25:
-            self.bullets.add(
-                Bullet(x=self.rect.centerx, y=self.rect.top, speed=10)
-            )
-            self.reload = time.time()
+        if keys[pg.K_t]:
+            self.change_weapon()
+        if self.cur_weapon == 1:
+            if keys[pg.K_SPACE] and time.time() - self.reload > 0.25:
+                self.bullets.add(
+                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=10, power=1)
+                )
+                self.reload = time.time()
+        else:
+            if keys[pg.K_SPACE] and time.time() - self.reload > 0.5:
+                self.bullets.add(
+                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=15, power=3)
+                )
+                self.reload = time.time()
 
     def get_hit(self):
         self.health -= 1
@@ -116,7 +133,8 @@ class Enemy(Base):
     def __init__(self, x, y, speed):
         super().__init__(x=x, y=y, speed=speed, img=img_enemy)
         self.health = 3
-        self.health_display = Text(x=self.rect.x, y=(self.rect.y-15), text="3/3", font_size=20)
+        self.health_display = Text(x=self.rect.x, y=(self.rect.y-15),
+                                   text="3/3", font_size=20)
 
     def update(self, player, bums, win):
         global lives, score
@@ -136,8 +154,10 @@ class Enemy(Base):
             self.rect.y = -50
             self.rect.x = random.randint(30, win_height - 30)
             score += 1
-        if pg.sprite.spritecollide(self, player.bullets, True):
-            self.health -= 1
+        coll = pg.sprite.spritecollide(self, player.bullets, True)
+        if coll:
+            for bull in coll:
+                self.health -= bull.power
         if self.health == 0:
             bums.add(
                 Bum(self.rect.centerx, self.rect.centery)
@@ -152,8 +172,9 @@ class Enemy(Base):
 
 
 class Bullet(Base):
-    def __init__(self, x, y, speed):
+    def __init__(self, x, y, speed, power):
         super().__init__(x=x, y=y, speed=speed, img=img_bull)
+        self.power = power
 
     def update(self):
         self.rect.y -= self.speed
