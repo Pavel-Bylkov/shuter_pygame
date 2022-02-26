@@ -108,7 +108,7 @@ class Hero(Base):
         if keys[pg.K_t]:
             self.change_weapon()
         if self.cur_weapon == 1:
-            if keys[pg.K_SPACE] and time.time() - self.reload > 0.25:
+            if keys[pg.K_SPACE] and time.time() - self.reload > 0.15:
                 self.bullets.add(
                     Bullet(x=self.rect.centerx, y=self.rect.top, speed=10, power=1)
                 )
@@ -159,7 +159,7 @@ class Enemy(Base):
         if coll:
             for bull in coll:
                 self.health -= bull.power
-        if self.health == 0:
+        if self.health <= 0:
             bums.add(
                 Bum(self.rect.centerx, self.rect.centery)
             )
