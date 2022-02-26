@@ -84,7 +84,8 @@ class Hero(Base):
         self.reload = time.time()
         self.health = 3
         self.health_display = Text(x=20, y=90, text="Health: 3", font_size=30)
-        self.cur_weapon = 1  # 1 - blaster, 2 - fireball
+        self.cur_weapon = 1
+        # 1 - blaster, 2 - fireball
 
     def change_weapon(self):
         if self.cur_weapon == 1:
