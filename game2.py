@@ -8,8 +8,18 @@ import time
 # todo add give many and pay upgrades
 # todo add levels and boss
 # todo diff enemys and boss
+# todo add store with weapon strangth, firrate, restore HP
+# todo add controller spawn monsters with level limits
+
 
 FPS = 20
+
+coins = 0
+level = 1
+
+limits_levels = [10, 20, 30]
+stop_spawn = False
+
 # запускаем инициализацию pygame - настройка на наше железо
 pg.init()
 pg.font.init()
@@ -84,8 +94,8 @@ class Hero(Base):
         super().__init__(x=x, y=y, speed=speed, img=img_hero)
         self.bullets = pg.sprite.Group()
         self.reload = time.time()
-        self.health = 10
-        self.health_display = Text(x=20, y=90, text="Health: 10", font_size=30)
+        self.health = 100
+        self.health_display = Text(x=20, y=90, text="Health: 100", font_size=30)
         self.cur_weapon = 1
         # 1 - blaster, 2 - fireball
 
@@ -112,19 +122,21 @@ class Hero(Base):
         if self.cur_weapon == 1:
             if keys[pg.K_SPACE] and time.time() - self.reload > 0.15:
                 self.bullets.add(
-                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=10, power=1)
+                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=10,
+                           power=random.randint(1, 2))
                 )
                 self.reload = time.time()
         else:
             if keys[pg.K_SPACE] and time.time() - self.reload > 0.5:
                 self.bullets.add(
-                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=15, power=3)
+                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=15,
+                           power=random.randint(3, 5))
                 )
                 self.reload = time.time()
 
-    def get_hit(self):
-        self.health -= 1
-        if self.health == 0:
+    def get_hit(self, power):
+        self.health -= power
+        if self.health <= 0:
             game_over()
 
     def reset(self, win):
@@ -135,28 +147,27 @@ class Hero(Base):
 class Enemy(Base):
     def __init__(self, x, y, speed):
         super().__init__(x=x, y=y, speed=speed, img=img_enemy)
-        self.health = 3
+        self.health = random.randint(3, 5)
         self.health_display = Text(x=self.rect.x, y=(self.rect.y-15),
-                                   text="3/3", font_size=20)
+                                   text=f"{self.health}", font_size=20)
 
     def update(self, player, bums, win):
-        global lives, score
+        global coins
         self.rect.y += self.speed
         self.rect.x += random.randint(-self.speed, self.speed)
         self.health_display.change_pos(self.rect.x, self.rect.y - 15)
         if self.rect.y > win_height:
             self.rect.y = -50
             self.rect.x = random.randint(30, win_height - 30)
-            if lives > 0:
-                lives -= 1
+            player.get_hit(self.health)
         if pg.sprite.collide_rect(self, player):
-            player.get_hit()
+            player.get_hit(self.health)
             bums.add(
                 Bum(self.rect.centerx, self.rect.centery)
             )
             self.rect.y = -50
             self.rect.x = random.randint(30, win_height - 30)
-            score += 1
+            coins += 1
         coll = pg.sprite.spritecollide(self, player.bullets, True)
         if coll:
             for bull in coll:
@@ -167,9 +178,9 @@ class Enemy(Base):
             )
             self.rect.y = -50
             self.rect.x = random.randint(30, win_height - 30)
-            score += 1
-            self.health = 3
-        self.health_display.update(f"{self.health}/3")
+            coins += 1
+            self.health = random.randint(3, 5)
+        self.health_display.update(f"{self.health}")
         self.health_display.reset(win)
 
 
@@ -222,11 +233,11 @@ window = pg.display.set_mode((win_width, win_height))
 hero = Hero(x=500, y=700, speed=12)
 
 # создаем надписи на экране
-score_display = Text(x=20, y=30, text="Score: 0", font_size=30)
-score = 0
+level_display = Text(x=20, y=5, text="LEVEL: 1", font_size=30)
+coins_display = Text(x=20, y=35, text="Coins: 0", font_size=30)
 
-lives_display = Text(x=20, y=60, text="Lives: 3", font_size=30)
-lives = 10
+
+
 
 # чтобы работала группа, необходимо наследоваться от pg.sprite.Sprite
 monsters = pg.sprite.Group()
@@ -265,19 +276,13 @@ while run:
         bums.update()
         bums.draw(window)
 
-        if pg.sprite.spritecollide(hero, monsters, True) and lives > 0:
-            lives -= 1
+        coins_display.update(f"Coins: {coins}")
+        coins_display.reset(window)
+        level_display.update(f"LEVEL: {level}")
+        level_display.reset(window)
 
-        if lives == 1:
-            lives_display.change_color(RED_COLOR)
-
-        score_display.update(f"Score: {score}")
-        score_display.reset(window)
-        lives_display.update(f"Lives: {lives}")
-        lives_display.reset(window)
-
-        if lives == 0:
-            game_over()
+        if coins + len(monsters):
+            stop_spawn = True
 
         pg.display.update()
 
