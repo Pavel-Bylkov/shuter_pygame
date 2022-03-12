@@ -145,29 +145,28 @@ class Hero(Base):
         self.health_display.reset(win)
 
 class Enemy(Base):
-    def __init__(self, x, y, speed):
+    def __init__(self, x, y, speed, health):
         super().__init__(x=x, y=y, speed=speed, img=img_enemy)
-        self.health = random.randint(3, 5)
+        self.health = health
+        self.power = health
         self.health_display = Text(x=self.rect.x, y=(self.rect.y-15),
                                    text=f"{self.health}", font_size=20)
 
-    def update(self, player, bums, win):
-        global coins
+    def move(self):
         self.rect.y += self.speed
         self.rect.x += random.randint(-self.speed, self.speed)
+
+    def update(self, player, bums, win):
+        global coins
+
+        self.move()
         self.health_display.change_pos(self.rect.x, self.rect.y - 15)
-        if self.rect.y > win_height:
-            self.rect.y = -50
-            self.rect.x = random.randint(30, win_height - 30)
-            player.get_hit(self.health)
+        if self.rect.y > win_height + 50:
+            self.kill()
+            player.get_hit(self.power)
         if pg.sprite.collide_rect(self, player):
-            player.get_hit(self.health)
-            bums.add(
-                Bum(self.rect.centerx, self.rect.centery)
-            )
-            self.rect.y = -50
-            self.rect.x = random.randint(30, win_height - 30)
-            coins += 1
+            player.get_hit(self.power)
+            self.health = 0
         coll = pg.sprite.spritecollide(self, player.bullets, True)
         if coll:
             for bull in coll:
@@ -176,14 +175,17 @@ class Enemy(Base):
             bums.add(
                 Bum(self.rect.centerx, self.rect.centery)
             )
-            self.rect.y = -50
-            self.rect.x = random.randint(30, win_height - 30)
-            coins += 1
-            self.health = random.randint(3, 5)
+            self.kill()
+            coins += self.power
+
         self.health_display.update(f"{self.health}")
         self.health_display.reset(win)
 
 
+class Enemy2(Enemy):
+
+    def move(self):
+        self.rect.y += self.speed
 
 class Bullet(Base):
     def __init__(self, x, y, speed, power):
@@ -219,11 +221,72 @@ class Bum(pg.sprite.Sprite):
     def reset(self, win):
         win.blit(self.image, (self.rect.x, self.rect.y))
 
+
+class Controller:
+    def __init__(self):
+        self.monsters1 = pg.sprite.Group()
+        self.levels = {
+            1: {1: 10},
+            2: {1: 15, 2: 5},
+            3: {1: 10, 2: 10}
+        }
+        self.level = 1
+        self.timer = time.time()
+        self.level_display = Text(x=20, y=5, text="LEVEL: 1", font_size=30)
+        self.coins_display = Text(x=20, y=35, text="Coins: 0", font_size=30)
+
+    def get_next_monster(self):
+        level = self.levels[self.level]
+        if len(level) == 0 and len(self.levels) > 0:
+            del self.levels[self.level]
+            self.level += 1
+        if len(self.levels) == 0:
+            game_win()
+            return
+        #todo error ValueError: min() arg is an empty sequence
+
+        type = random.randint(min(level), max(level))
+        self.levels[self.level][type] -= 1
+        if self.levels[self.level][type] == 0:
+            del self.levels[self.level][type]
+        if type == 1:
+            self.monsters1.add(
+                Enemy(x=random.randint(3, win_width // 10 - 4) * 10,
+                      y=random.randint(-500, -30),
+                      speed=random.randint(3, 7), health=4)
+            )
+        elif type == 2:
+            self.monsters1.add(
+                Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
+                      y=random.randint(-500, -30),
+                      speed=random.randint(3, 7), health=10)
+            )
+
+    def update(self, hero, bums, window):
+        if time.time() - self.timer >= 1:
+            self.get_next_monster()
+            self.timer = time.time()
+        self.monsters1.update(hero, bums, window)
+        self.monsters1.draw(window)
+        self.level_display.update(f"LEVEL: {level}")
+        self.level_display.reset(window)
+        self.coins_display.update(f"Coins: {coins}")
+        self.coins_display.reset(window)
+
+
 def game_over():
     global finish
 
     finish = True
     window.blit(gameover, (0, 0))
+
+def game_win():
+    global finish
+
+    finish = True
+    win_display = Text(x=win_width//2, y=win_height//2, text="WIN",
+                       font_size=150, color=GREEN_COLOR)
+    win_display.reset(window)
 
 # Создаем окошко
 pg.display.set_caption("Shooter")  # Title у окна
@@ -232,21 +295,9 @@ window = pg.display.set_mode((win_width, win_height))
 # создаем спрайты
 hero = Hero(x=500, y=700, speed=12)
 
-# создаем надписи на экране
-level_display = Text(x=20, y=5, text="LEVEL: 1", font_size=30)
-coins_display = Text(x=20, y=35, text="Coins: 0", font_size=30)
-
-
-
-
 # чтобы работала группа, необходимо наследоваться от pg.sprite.Sprite
-monsters = pg.sprite.Group()
-for k in range(5):
-    monsters.add(
-        Enemy(x=random.randint(3, win_width // 10 - 4) * 10,
-              y=random.randint(-500, -30),
-              speed=random.randint(3, 7))
-    )
+controller = Controller()
+
 
 bums = pg.sprite.Group()
 
@@ -270,19 +321,10 @@ while run:
         hero.update()
         hero.reset(window)
 
-        monsters.update(hero, bums, window)
-        monsters.draw(window)
+        controller.update(hero, bums, window)
 
         bums.update()
         bums.draw(window)
-
-        coins_display.update(f"Coins: {coins}")
-        coins_display.reset(window)
-        level_display.update(f"LEVEL: {level}")
-        level_display.reset(window)
-
-        if coins + len(monsters):
-            stop_spawn = True
 
         pg.display.update()
 
