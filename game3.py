@@ -36,7 +36,7 @@ img_hero = pg.transform.scale(pg.image.load("rocket.png"), (60, 80))
 img_enemy = pg.transform.scale(pg.image.load("ufo.png"), (70, 50))
 # подготавливаем картинку для геймовера
 gameover = pg.transform.scale(pg.image.load("gameover.jpeg"), (win_width, win_height))
-img_bull = pg.transform.scale(pg.image.load("fireball.png"), (15, 15))
+img_bull = pg.transform.scale(pg.image.load("fire_blue.png"), (15, 15))
 img_bull2 = pg.transform.scale(pg.image.load("blaster.png"), (15, 15))
 img_bum = "Взрыв4.png"
 images_for_bum = []
@@ -232,19 +232,19 @@ class Controller:
         }
         self.level = 1
         self.timer = time.time()
+        self.pause = False
+        self.pause_timer = 0
         self.level_display = Text(x=20, y=5, text="LEVEL: 1", font_size=30)
         self.coins_display = Text(x=20, y=35, text="Coins: 0", font_size=30)
 
     def get_next_monster(self):
         if len(self.levels) == 0:
-            return
+            return True
         level = self.levels[self.level]
         if len(level) == 0 and len(self.levels) > 0:
             del self.levels[self.level]
             self.level += 1
-            return
-        #todo error ValueError: min() arg is an empty sequence
-
+            return True
         type = random.randint(min(level), max(level))
         self.levels[self.level][type] -= 1
         if self.levels[self.level][type] == 0:
@@ -261,11 +261,25 @@ class Controller:
                       y=random.randint(-500, -30),
                       speed=random.randint(3, 7), health=10)
             )
+        return False
 
     def update(self, hero, bums, window):
-        if time.time() - self.timer >= 1:
-            self.get_next_monster()
-            self.timer = time.time()
+        if not self.pause:
+            hero.update()
+            hero.reset(window)
+            bums.update()
+            bums.draw(window)
+            if time.time() - self.timer >= 1:
+                self.timer = time.time()
+                if self.get_next_monster():
+                    self.level_change()
+        elif time.time() - self.pause_timer >= 2:
+            self.pause = False
+        else:
+            level_display = Text(x=win_width // 2, y=win_height // 2,
+                                 text=f"LEVEL {self.level}",
+                                 font_size=150, color=GREEN_COLOR)
+            level_display.reset(window)
         if self.level > 1 and len(self.monsters1) == 0:
             game_win()
         else:
@@ -275,6 +289,11 @@ class Controller:
         self.level_display.reset(window)
         self.coins_display.update(f"Coins: {coins}")
         self.coins_display.reset(window)
+
+    def level_change(self):
+        self.pause = True
+        self.pause_timer = time.time()
+
 
 
 def game_over():
@@ -290,6 +309,7 @@ def game_win():
     win_display = Text(x=win_width//2, y=win_height//2, text="WIN",
                        font_size=150, color=GREEN_COLOR)
     win_display.reset(window)
+
 
 # Создаем окошко
 pg.display.set_caption("Shooter")  # Title у окна
@@ -320,15 +340,7 @@ while run:
     if not finish:
         # обновляем фон
         window.blit(background, (0, 0))
-
-        hero.update()
-        hero.reset(window)
-
         controller.update(hero, bums, window)
-
-        bums.update()
-        bums.draw(window)
-
         pg.display.update()
 
     # цикл срабатывает каждую 0.05 секунд
