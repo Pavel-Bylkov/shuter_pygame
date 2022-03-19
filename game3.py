@@ -266,7 +266,7 @@ class Controller:
         if time.time() - self.timer >= 1:
             self.get_next_monster()
             self.timer = time.time()
-        if len(self.monsters1) == 0:
+        if self.level > 1 and len(self.monsters1) == 0:
             game_win()
         else:
             self.monsters1.update(hero, bums, window)
