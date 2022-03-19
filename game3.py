@@ -238,13 +238,13 @@ class Controller:
         self.coins_display = Text(x=20, y=35, text="Coins: 0", font_size=30)
 
     def get_next_monster(self):
-        if len(self.levels) == 0:
-            return True
         level = self.levels[self.level]
         if len(level) == 0 and len(self.levels) > 0:
             del self.levels[self.level]
-            self.level += 1
-            return True
+            if len(self.levels) > 0:
+                self.level += 1
+                return True
+            return False
         type = random.randint(min(level), max(level))
         self.levels[self.level][type] -= 1
         if self.levels[self.level][type] == 0:
@@ -252,13 +252,13 @@ class Controller:
         if type == 1:
             self.monsters1.add(
                 Enemy(x=random.randint(3, win_width // 10 - 4) * 10,
-                      y=random.randint(-500, -30),
+                      y=random.randint(-50, -10),
                       speed=random.randint(3, 7), health=4)
             )
         elif type == 2:
             self.monsters1.add(
                 Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
-                      y=random.randint(-500, -30),
+                      y=random.randint(-50, -10),
                       speed=random.randint(3, 7), health=10)
             )
         return False
@@ -271,20 +271,21 @@ class Controller:
             bums.draw(window)
             if time.time() - self.timer >= 1:
                 self.timer = time.time()
-                if self.get_next_monster():
+                if len(self.levels) != 0 and self.get_next_monster():
                     self.level_change()
+            if self.level > 1 and len(self.monsters1) == 0:
+                game_win()
+            else:
+                self.monsters1.update(hero, bums, window)
+                self.monsters1.draw(window)
         elif time.time() - self.pause_timer >= 2:
             self.pause = False
         else:
-            level_display = Text(x=win_width // 2, y=win_height // 2,
+            level_display = Text(x=win_width // 2 - 100, y=win_height // 2 - 50,
                                  text=f"LEVEL {self.level}",
                                  font_size=150, color=GREEN_COLOR)
             level_display.reset(window)
-        if self.level > 1 and len(self.monsters1) == 0:
-            game_win()
-        else:
-            self.monsters1.update(hero, bums, window)
-            self.monsters1.draw(window)
+
         self.level_display.update(f"LEVEL: {self.level}")
         self.level_display.reset(window)
         self.coins_display.update(f"Coins: {coins}")
