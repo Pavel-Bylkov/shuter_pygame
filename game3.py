@@ -236,12 +236,12 @@ class Controller:
         self.coins_display = Text(x=20, y=35, text="Coins: 0", font_size=30)
 
     def get_next_monster(self):
+        if len(self.levels) == 0:
+            return
         level = self.levels[self.level]
         if len(level) == 0 and len(self.levels) > 0:
             del self.levels[self.level]
             self.level += 1
-        if len(self.levels) == 0:
-            game_win()
             return
         #todo error ValueError: min() arg is an empty sequence
 
@@ -266,9 +266,12 @@ class Controller:
         if time.time() - self.timer >= 1:
             self.get_next_monster()
             self.timer = time.time()
-        self.monsters1.update(hero, bums, window)
-        self.monsters1.draw(window)
-        self.level_display.update(f"LEVEL: {level}")
+        if len(self.monsters1) == 0:
+            game_win()
+        else:
+            self.monsters1.update(hero, bums, window)
+            self.monsters1.draw(window)
+        self.level_display.update(f"LEVEL: {self.level}")
         self.level_display.reset(window)
         self.coins_display.update(f"Coins: {coins}")
         self.coins_display.reset(window)
