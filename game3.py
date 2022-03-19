@@ -226,14 +226,14 @@ class Controller:
     def __init__(self):
         self.monsters1 = pg.sprite.Group()
         self.levels = {
-            1: {1: 10},
-            2: {1: 15, 2: 5},
-            3: {1: 10, 2: 10}
+            1: {1: 5},
+            2: {1: 5, 2: 3},
+            3: {1: 5, 2: 5}
         }
         self.level = 1
         self.timer = time.time()
-        self.pause = False
-        self.pause_timer = 0
+        self.pause = True
+        self.pause_timer = time.time()
         self.level_display = Text(x=20, y=5, text="LEVEL: 1", font_size=30)
         self.coins_display = Text(x=20, y=35, text="Coins: 0", font_size=30)
 
@@ -243,6 +243,7 @@ class Controller:
             del self.levels[self.level]
             if len(self.levels) > 0:
                 self.level += 1
+                self.level_change()
                 return True
             return False
         type = random.randint(min(level), max(level))
@@ -263,6 +264,8 @@ class Controller:
             )
         return False
 
+    #todo смена уровня - после уничтожения всех текущих монстров
+
     def update(self, hero, bums, window):
         if not self.pause:
             hero.update()
@@ -271,8 +274,8 @@ class Controller:
             bums.draw(window)
             if time.time() - self.timer >= 1:
                 self.timer = time.time()
-                if len(self.levels) != 0 and self.get_next_monster():
-                    self.level_change()
+                if len(self.levels) != 0:
+                    self.get_next_monster()
             if self.level > 1 and len(self.monsters1) == 0:
                 game_win()
             else:
