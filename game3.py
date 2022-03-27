@@ -224,28 +224,28 @@ class Bum(pg.sprite.Sprite):
 
 class Controller:
     def __init__(self):
+        # Создаем окошко
+        pg.display.set_caption("Shooter")  # Title у окна
+        self.window = pg.display.set_mode((win_width, win_height))
+        # создаем спрайты
+        self.hero = Hero(x=500, y=700, speed=12)
         self.monsters1 = pg.sprite.Group()
+        self.bums = pg.sprite.Group()
         self.levels = {
             1: {1: 5},
             2: {1: 5, 2: 3},
             3: {1: 5, 2: 5}
         }
-        self.level = 1
+        self.cur_level = 1
         self.timer = time.time()
         self.pause = True
         self.pause_timer = time.time()
         self.level_display = Text(x=20, y=5, text="LEVEL: 1", font_size=30)
         self.coins_display = Text(x=20, y=35, text="Coins: 0", font_size=30)
+        self.result_display = None
 
     def get_next_monster(self):
         level = self.levels[self.level]
-        if len(level) == 0 and len(self.levels) > 0:
-            del self.levels[self.level]
-            if len(self.levels) > 0:
-                self.level += 1
-                self.level_change()
-                return True
-            return False
         type = random.randint(min(level), max(level))
         self.levels[self.level][type] -= 1
         if self.levels[self.level][type] == 0:
@@ -266,67 +266,69 @@ class Controller:
 
     #todo смена уровня - после уничтожения всех текущих монстров
 
-    def update(self, hero, bums, window):
+    def draw(self):
+        # обновляем фон
+        self.window.blit(background, (0, 0))
+        self.hero.reset(self.window)
+        self.bums.draw(self.window)
+        self.monsters1.draw(self.window)
+        self.level_display.reset(self.window)
+        self.coins_display.reset(self.window)
+        if self.pause:
+            level_display = Text(x=win_width // 2 - 100, y=win_height // 2 - 50,
+                                 text=f"LEVEL {self.cur_level}",
+                                 font_size=150, color=GREEN_COLOR)
+            level_display.reset(self.window)
+        if finish:
+            self.result_display.reset(self.window)
+
+    def update(self):
         if not self.pause:
-            hero.update()
-            hero.reset(window)
-            bums.update()
-            bums.draw(window)
+            self.hero.update()
+            self.bums.update()
             if time.time() - self.timer >= 1:
                 self.timer = time.time()
                 if len(self.levels) != 0:
-                    self.get_next_monster()
-            if self.level > 1 and len(self.monsters1) == 0:
-                game_win()
+                    if len(self.levels[self.cur_level]) == 0 and len(self.levels) > 0:
+                        del self.levels[self.cur_level]
+                        if len(self.levels) > 0 and len(self.monsters1) == 0:
+                            self.cur_level += 1
+                            self.level_change()
+                    else:
+                        self.get_next_monster()
+            if self.cur_level > 1 and len(self.monsters1) == 0:
+                self.game_win()
             else:
-                self.monsters1.update(hero, bums, window)
-                self.monsters1.draw(window)
+                self.monsters1.update(self.hero, self.bums, self.window)
         elif time.time() - self.pause_timer >= 2:
             self.pause = False
-        else:
-            level_display = Text(x=win_width // 2 - 100, y=win_height // 2 - 50,
-                                 text=f"LEVEL {self.level}",
-                                 font_size=150, color=GREEN_COLOR)
-            level_display.reset(window)
 
         self.level_display.update(f"LEVEL: {self.level}")
-        self.level_display.reset(window)
         self.coins_display.update(f"Coins: {coins}")
-        self.coins_display.reset(window)
 
     def level_change(self):
         self.pause = True
         self.pause_timer = time.time()
 
+    def game_over(self):
+        global finish
+
+        finish = True
+        self.result_display = Text(x=win_width//2, y=win_height//2, text="GAME OVER",
+                           font_size=150, color=RED_COLOR)
+
+    def game_win(self):
+        global finish
+
+        finish = True
+        self.result_display = Text(x=win_width//2, y=win_height//2, text="WIN",
+                           font_size=150, color=GREEN_COLOR)
 
 
-def game_over():
-    global finish
-
-    finish = True
-    window.blit(gameover, (0, 0))
-
-def game_win():
-    global finish
-
-    finish = True
-    win_display = Text(x=win_width//2, y=win_height//2, text="WIN",
-                       font_size=150, color=GREEN_COLOR)
-    win_display.reset(window)
-
-
-# Создаем окошко
-pg.display.set_caption("Shooter")  # Title у окна
-window = pg.display.set_mode((win_width, win_height))
-
-# создаем спрайты
-hero = Hero(x=500, y=700, speed=12)
 
 # чтобы работала группа, необходимо наследоваться от pg.sprite.Sprite
 controller = Controller()
 
-
-bums = pg.sprite.Group()
 
 # переменная "игра закончилась": как только там True,
 # в основном цикле перестают работать спрайты
@@ -342,9 +344,8 @@ while run:
             run = False
 
     if not finish:
-        # обновляем фон
-        window.blit(background, (0, 0))
-        controller.update(hero, bums, window)
+        controller.update()
+        controller.draw()
         pg.display.update()
 
     # цикл срабатывает каждую 0.05 секунд
