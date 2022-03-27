@@ -232,9 +232,9 @@ class Controller:
         self.monsters1 = pg.sprite.Group()
         self.bums = pg.sprite.Group()
         self.levels = {
-            1: {1: 5},
-            2: {1: 5, 2: 3},
-            3: {1: 5, 2: 5}
+            1: {1: 3},
+            2: {1: 2, 2: 3},
+            3: {1: 2, 2: 2}
         }
         self.cur_level = 1
         self.timer = time.time()
@@ -245,11 +245,11 @@ class Controller:
         self.result_display = None
 
     def get_next_monster(self):
-        level = self.levels[self.level]
+        level = self.levels[self.cur_level]
         type = random.randint(min(level), max(level))
-        self.levels[self.level][type] -= 1
-        if self.levels[self.level][type] == 0:
-            del self.levels[self.level][type]
+        self.levels[self.cur_level][type] -= 1
+        if self.levels[self.cur_level][type] == 0:
+            del self.levels[self.cur_level][type]
         if type == 1:
             self.monsters1.add(
                 Enemy(x=random.randint(3, win_width // 10 - 4) * 10,
@@ -288,25 +288,28 @@ class Controller:
             self.bums.update()
             if time.time() - self.timer >= 1:
                 self.timer = time.time()
-                if len(self.levels) != 0:
-                    if len(self.levels[self.cur_level]) == 0 and len(self.levels) > 0:
-                        del self.levels[self.cur_level]
+                if len(self.levels) != 0 and self.cur_level in self.levels:
+                    if len(self.levels[self.cur_level]) == 0:
                         if len(self.levels) > 0 and len(self.monsters1) == 0:
-                            self.cur_level += 1
-                            self.level_change()
-                    else:
+                            del self.levels[self.cur_level]
+                            print("del ", self.cur_level)
+                            if len(self.levels) != 0:
+                                self.cur_level += 1
+                                self.level_change()
+                    elif len(self.levels[self.cur_level]) != 0:
                         self.get_next_monster()
-            if self.cur_level > 1 and len(self.monsters1) == 0:
+            if len(self.levels) == 0 and len(self.monsters1) == 0:
                 self.game_win()
             else:
                 self.monsters1.update(self.hero, self.bums, self.window)
         elif time.time() - self.pause_timer >= 2:
             self.pause = False
 
-        self.level_display.update(f"LEVEL: {self.level}")
+        self.level_display.update(f"LEVEL: {self.cur_level}")
         self.coins_display.update(f"Coins: {coins}")
 
     def level_change(self):
+
         self.pause = True
         self.pause_timer = time.time()
 
