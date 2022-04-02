@@ -6,7 +6,7 @@ import time
 # todo add level boss
 # todo diff enemys and boss
 # todo add store with weapon strangth, firrate, restore HP
-
+# todo при смене оружия выводить сообщение или показывать на экране тип текущего оружия
 
 FPS = 20
 
