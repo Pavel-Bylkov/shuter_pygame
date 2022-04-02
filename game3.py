@@ -2,14 +2,10 @@ import pygame as pg
 import random
 import time
 
-# todo Добавить режимы игр
-# ToDo make it so that when rocket and ufo interact the ufo
-# disappears and u get point not u lose game
 # todo add give many and pay upgrades
-# todo add levels and boss
+# todo add level boss
 # todo diff enemys and boss
 # todo add store with weapon strangth, firrate, restore HP
-# todo add controller spawn monsters with level limits
 
 
 FPS = 20
@@ -234,11 +230,16 @@ class Level:
         if type == 1:
             return Enemy(x=random.randint(3, win_width // 10 - 4) * 10,
                       y=random.randint(-50, -10),
-                      speed=random.randint(3, 7), health=4)
+                      speed=4, health=4)
         elif type == 2:
             return Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
                       y=random.randint(-50, -10),
-                      speed=random.randint(3, 7), health=10)
+                      speed=7, health=2)
+        elif type == 3:
+            return Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
+                      y=random.randint(-50, -10),
+                      speed=2, health=10)
+
 
 class Controller:
     def __init__(self):
@@ -250,10 +251,12 @@ class Controller:
         self.monsters1 = pg.sprite.Group()
         self.bums = pg.sprite.Group()
         self.levels = [
-            Level(1, {1: 3}),
-            Level(2, {1: 2, 2: 3}),
-            Level(3, {1: 2, 2: 2}),
-            Level(4, {1: 4, 2: 2})
+            Level(1, {1: 5}),
+            Level(2, {1: 7}),
+            Level(3, {1: 10, 2: 2}),
+            Level(4, {2: 5}),
+            Level(5, {1: 5, 2: 5}),
+            Level(6, {3: 5})
         ]
         self.cur_level = self.levels.pop(0)
         self.timer = time.time()
