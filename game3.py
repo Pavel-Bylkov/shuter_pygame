@@ -253,7 +253,7 @@ class Controller:
         self.levels = [
             Level(1, {1: 5}),
             Level(2, {1: 7}),
-            Level(3, {1: 10, 2: 2}),
+            Level(3, {1: 10}),
             Level(4, {2: 5}),
             Level(5, {1: 5, 2: 5}),
             Level(6, {3: 5})
