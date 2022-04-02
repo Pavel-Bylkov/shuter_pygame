@@ -14,10 +14,6 @@ import time
 
 FPS = 20
 
-coins = 0
-level = 1
-
-limits_levels = [10, 20, 30]
 stop_spawn = False
 
 # запускаем инициализацию pygame - настройка на наше железо
@@ -105,6 +101,22 @@ class Hero(Base):
         else:
             self.cur_weapon = 1
 
+    def fire(self):
+        if self.cur_weapon == 1:
+            if time.time() - self.reload > 0.15:
+                self.bullets.add(
+                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=10,
+                           power=random.randint(1, 2))
+                )
+                self.reload = time.time()
+        else:
+            if time.time() - self.reload > 0.5:
+                self.bullets.add(
+                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=15,
+                           power=random.randint(3, 5))
+                )
+                self.reload = time.time()
+
     def update(self):
         self.bullets.update()
         self.health_display.update(f"Health: {self.health}")
@@ -119,25 +131,14 @@ class Hero(Base):
             self.rect.x += self.speed
         if keys[pg.K_t]:
             self.change_weapon()
-        if self.cur_weapon == 1:
-            if keys[pg.K_SPACE] and time.time() - self.reload > 0.15:
-                self.bullets.add(
-                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=10,
-                           power=random.randint(1, 2))
-                )
-                self.reload = time.time()
-        else:
-            if keys[pg.K_SPACE] and time.time() - self.reload > 0.5:
-                self.bullets.add(
-                    Bullet(x=self.rect.centerx, y=self.rect.top, speed=15,
-                           power=random.randint(3, 5))
-                )
-                self.reload = time.time()
+        if keys[pg.K_SPACE]:
+            self.fire()
 
     def get_hit(self, power):
         self.health -= power
-        if self.health <= 0:
-            game_over()
+
+    def is_dead(self):
+        return self.health <= 0
 
     def reset(self, win):
         super().reset(win)
@@ -156,30 +157,20 @@ class Enemy(Base):
         self.rect.y += self.speed
         self.rect.x += random.randint(-self.speed, self.speed)
 
-    def update(self, player, bums, win):
-        global coins
-
-        self.move()
-        self.health_display.change_pos(self.rect.x, self.rect.y - 15)
+    def is_lose(self):
         if self.rect.y > win_height + 50:
             self.kill()
-            player.get_hit(self.power)
-        if pg.sprite.collide_rect(self, player):
-            player.get_hit(self.power)
-            self.health = 0
-        coll = pg.sprite.spritecollide(self, player.bullets, True)
-        if coll:
-            for bull in coll:
-                self.health -= bull.power
-        if self.health <= 0:
-            bums.add(
-                Bum(self.rect.centerx, self.rect.centery)
-            )
-            self.kill()
-            coins += self.power
+            return True
+        return False
 
-        self.health_display.update(f"{self.health}")
+    def health_draw(self, win):
         self.health_display.reset(win)
+
+    def update(self):
+        self.move()
+        self.health_display.change_pos(self.rect.x, self.rect.y - 15)
+        self.health_display.update(f"{self.health}")
+
 
 
 class Enemy2(Enemy):
@@ -222,6 +213,33 @@ class Bum(pg.sprite.Sprite):
         win.blit(self.image, (self.rect.x, self.rect.y))
 
 
+class Level:
+    def __init__(self, number, n_type):
+        self.number = number
+        self.n_type = n_type
+
+    def __len__(self):
+        return len(self.n_type)
+
+    def is_end_level(self):
+        return len(self.n_type) == 0
+
+    def get_next_monster(self):
+        types = list(self.n_type.keys())
+        random.shuffle(types)
+        type = types.pop()
+        self.n_type[type] -= 1
+        if self.n_type[type] == 0:
+            del self.n_type[type]
+        if type == 1:
+            return Enemy(x=random.randint(3, win_width // 10 - 4) * 10,
+                      y=random.randint(-50, -10),
+                      speed=random.randint(3, 7), health=4)
+        elif type == 2:
+            return Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
+                      y=random.randint(-50, -10),
+                      speed=random.randint(3, 7), health=10)
+
 class Controller:
     def __init__(self):
         # Создаем окошко
@@ -231,40 +249,21 @@ class Controller:
         self.hero = Hero(x=500, y=700, speed=12)
         self.monsters1 = pg.sprite.Group()
         self.bums = pg.sprite.Group()
-        self.levels = {
-            1: {1: 3},
-            2: {1: 2, 2: 3},
-            3: {1: 2, 2: 2}
-        }
-        self.cur_level = 1
+        self.levels = [
+            Level(1, {1: 3}),
+            Level(2, {1: 2, 2: 3}),
+            Level(3, {1: 2, 2: 2}),
+            Level(4, {1: 4, 2: 2})
+        ]
+        self.cur_level = self.levels.pop(0)
         self.timer = time.time()
         self.pause = True
         self.pause_timer = time.time()
+        self.coins = 0
         self.level_display = Text(x=20, y=5, text="LEVEL: 1", font_size=30)
         self.coins_display = Text(x=20, y=35, text="Coins: 0", font_size=30)
         self.result_display = None
 
-    def get_next_monster(self):
-        level = self.levels[self.cur_level]
-        type = random.randint(min(level), max(level))
-        self.levels[self.cur_level][type] -= 1
-        if self.levels[self.cur_level][type] == 0:
-            del self.levels[self.cur_level][type]
-        if type == 1:
-            self.monsters1.add(
-                Enemy(x=random.randint(3, win_width // 10 - 4) * 10,
-                      y=random.randint(-50, -10),
-                      speed=random.randint(3, 7), health=4)
-            )
-        elif type == 2:
-            self.monsters1.add(
-                Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
-                      y=random.randint(-50, -10),
-                      speed=random.randint(3, 7), health=10)
-            )
-        return False
-
-    #todo смена уровня - после уничтожения всех текущих монстров
 
     def draw(self):
         # обновляем фон
@@ -272,44 +271,61 @@ class Controller:
         self.hero.reset(self.window)
         self.bums.draw(self.window)
         self.monsters1.draw(self.window)
+        for monster in self.monsters1:
+            monster.health_draw(self.window)
         self.level_display.reset(self.window)
         self.coins_display.reset(self.window)
         if self.pause:
-            level_display = Text(x=win_width // 2 - 100, y=win_height // 2 - 50,
-                                 text=f"LEVEL {self.cur_level}",
+            level_display = Text(x=win_width // 2 - 150, y=win_height // 2 - 50,
+                                 text=f"LEVEL {self.cur_level.number}",
                                  font_size=150, color=GREEN_COLOR)
             level_display.reset(self.window)
         if finish:
             self.result_display.reset(self.window)
 
+    def monsters_update(self):
+        for monster in self.monsters1:
+            monster.update()
+            if monster.is_lose():
+                self.hero.get_hit(monster.health)
+            if pg.sprite.collide_rect(monster, self.hero):
+                self.hero.get_hit(monster.health)
+                monster.health = 0
+            coll = pg.sprite.spritecollide(monster, self.hero.bullets, True)
+            for bull in coll:
+                monster.health -= bull.power
+            if monster.health <= 0:
+                self.bums.add(
+                    Bum(monster.rect.centerx, monster.rect.centery)
+                )
+                self.coins += monster.power
+                monster.kill()
+
     def update(self):
         if not self.pause:
             self.hero.update()
             self.bums.update()
-            if time.time() - self.timer >= 1:
+            if time.time() - self.timer >= random.randint(1, 3):
                 self.timer = time.time()
-                if len(self.levels) != 0 and self.cur_level in self.levels:
-                    if len(self.levels[self.cur_level]) == 0:
-                        if len(self.levels) > 0 and len(self.monsters1) == 0:
-                            del self.levels[self.cur_level]
-                            print("del ", self.cur_level)
-                            if len(self.levels) != 0:
-                                self.cur_level += 1
-                                self.level_change()
-                    elif len(self.levels[self.cur_level]) != 0:
-                        self.get_next_monster()
-            if len(self.levels) == 0 and len(self.monsters1) == 0:
+                if len(self.cur_level) == 0:
+                    if len(self.monsters1) == 0 and len(self.levels) != 0:
+                        self.level_change()
+                else:
+                    self.monsters1.add(self.cur_level.get_next_monster())
+            if (len(self.levels) == 0 and self.cur_level.is_end_level()
+                    and len(self.monsters1) == 0):
                 self.game_win()
             else:
-                self.monsters1.update(self.hero, self.bums, self.window)
+                self.monsters_update()
         elif time.time() - self.pause_timer >= 2:
             self.pause = False
-
-        self.level_display.update(f"LEVEL: {self.cur_level}")
-        self.coins_display.update(f"Coins: {coins}")
+        if self.hero.is_dead():
+            self.game_over()
+        self.level_display.update(f"LEVEL: {self.cur_level.number}")
+        self.coins_display.update(f"Coins: {self.coins}")
 
     def level_change(self):
-
+        self.cur_level = self.levels.pop(0)
         self.pause = True
         self.pause_timer = time.time()
 
@@ -317,14 +333,15 @@ class Controller:
         global finish
 
         finish = True
-        self.result_display = Text(x=win_width//2, y=win_height//2, text="GAME OVER",
+        self.result_display = Text(x=win_width//2-250, y=win_height//2-50,
+                                   text="GAME OVER",
                            font_size=150, color=RED_COLOR)
 
     def game_win(self):
         global finish
 
         finish = True
-        self.result_display = Text(x=win_width//2, y=win_height//2, text="WIN",
+        self.result_display = Text(x=win_width//2-150, y=win_height//2-50, text="WIN",
                            font_size=150, color=GREEN_COLOR)
 
 
