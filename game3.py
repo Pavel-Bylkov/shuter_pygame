@@ -102,14 +102,14 @@ class Hero(Base):
             if time.time() - self.reload > 0.15:
                 self.bullets.add(
                     Bullet(x=self.rect.centerx, y=self.rect.top, speed=10,
-                           power=random.randint(1, 2))
+                           power=1, img=img_bull)
                 )
                 self.reload = time.time()
         else:
             if time.time() - self.reload > 0.5:
                 self.bullets.add(
                     Bullet(x=self.rect.centerx, y=self.rect.top, speed=15,
-                           power=random.randint(3, 5))
+                           power=4, img=img_bull2)
                 )
                 self.reload = time.time()
 
@@ -175,8 +175,8 @@ class Enemy2(Enemy):
         self.rect.y += self.speed
 
 class Bullet(Base):
-    def __init__(self, x, y, speed, power):
-        super().__init__(x=x, y=y, speed=speed, img=img_bull)
+    def __init__(self, x, y, speed, power, img):
+        super().__init__(x=x, y=y, speed=speed, img=img)
         self.power = power
 
     def update(self):
