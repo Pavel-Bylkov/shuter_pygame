@@ -26,9 +26,12 @@ background = pg.transform.scale(back_img, (win_width, win_height))
 img_hero = pg.transform.scale(pg.image.load("rocket.png"), (60, 80))
 # враг
 img_enemy = pg.transform.scale(pg.image.load("ufo.png"), (70, 50))
+img_enemy2 = pg.transform.scale(pg.image.load("ship.png"), (50, 60))
+img_enemy3 = pg.transform.scale(pg.image.load("ship_star-wars.png"), (50, 60))
+img_enemy4 = pg.transform.scale(pg.image.load("mandocruiser.png"), (60, 80))
 # подготавливаем картинку для геймовера
 gameover = pg.transform.scale(pg.image.load("gameover.jpeg"), (win_width, win_height))
-img_bull = pg.transform.scale(pg.image.load("fire_blue.png"), (15, 15))
+img_bull = pg.transform.scale(pg.image.load("fire_blue.png"), (10, 10))
 img_bull2 = pg.transform.scale(pg.image.load("blaster.png"), (15, 15))
 img_bum = "Взрыв4.png"
 images_for_bum = []
@@ -125,7 +128,7 @@ class Hero(Base):
             self.rect.x -= self.speed
         if keys[pg.K_d]:
             self.rect.x += self.speed
-        if keys[pg.K_t]:
+        if keys[pg.K_r]:
             self.change_weapon()
         if keys[pg.K_SPACE]:
             self.fire()
@@ -142,8 +145,8 @@ class Hero(Base):
         self.health_display.reset(win)
 
 class Enemy(Base):
-    def __init__(self, x, y, speed, health):
-        super().__init__(x=x, y=y, speed=speed, img=img_enemy)
+    def __init__(self, x, y, speed, health, img):
+        super().__init__(x=x, y=y, speed=speed, img=img)
         self.health = health
         self.power = health
         self.health_display = Text(x=self.rect.x, y=(self.rect.y-15),
@@ -230,15 +233,19 @@ class Level:
         if type == 1:
             return Enemy(x=random.randint(3, win_width // 10 - 4) * 10,
                       y=random.randint(-50, -10),
-                      speed=4, health=4)
+                      speed=4, health=4, img=img_enemy)
         elif type == 2:
             return Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
                       y=random.randint(-50, -10),
-                      speed=7, health=2)
+                      speed=7, health=2, img=img_enemy3)
         elif type == 3:
             return Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
                       y=random.randint(-50, -10),
-                      speed=2, health=10)
+                      speed=2, health=10, img=img_enemy2)
+        elif type == 4:
+            return Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
+                      y=random.randint(-50, -10),
+                      speed=2, health=12, img=img_enemy4)
 
 
 class Controller:
@@ -253,10 +260,10 @@ class Controller:
         self.levels = [
             Level(1, {1: 5}),
             Level(2, {1: 7}),
-            Level(3, {1: 10}),
-            Level(4, {2: 5}),
+            Level(3, {1: 5, 2: 5}),
+            Level(4, {2: 5, 3: 3}),
             Level(5, {1: 5, 2: 5}),
-            Level(6, {3: 5})
+            Level(6, {3: 5, 4: 3})
         ]
         self.cur_level = self.levels.pop(0)
         self.timer = time.time()
