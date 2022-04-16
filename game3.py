@@ -128,7 +128,7 @@ class Hero(Base):
             self.rect.x -= self.speed
         if keys[pg.K_d]:
             self.rect.x += self.speed
-        if keys[pg.K_r]:
+        if keys[pg.K_r] or keys[pg.K_t]:
             self.change_weapon()
         if keys[pg.K_SPACE]:
             self.fire()
@@ -261,8 +261,8 @@ class Controller:
             Level(1, {1: 5}),
             Level(2, {1: 7}),
             Level(3, {1: 5, 2: 5}),
-            Level(4, {2: 5, 3: 3}),
-            Level(5, {1: 5, 2: 5}),
+            Level(4, {1: 10, 2: 5}),
+            Level(5, {3: 5}),
             Level(6, {3: 5, 4: 3})
         ]
         self.cur_level = self.levels.pop(0)
