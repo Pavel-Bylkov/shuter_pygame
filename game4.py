@@ -32,7 +32,7 @@ img_enemy4 = pg.transform.scale(pg.image.load("mandocruiser.png"), (60, 80))
 # подготавливаем картинку для геймовера
 gameover = pg.transform.scale(pg.image.load("gameover.jpeg"), (win_width, win_height))
 img_bull = pg.transform.scale(pg.image.load("fire_blue.png"), (10, 10))
-img_bull2 = pg.transform.scale(pg.image.load("blaster.png"), (15, 15))
+img_bull2 = pg.transform.scale(pg.image.load("fireball.png"), (20, 20))
 img_bum = "Взрыв4.png"
 images_for_bum = []
 for i in range(1, 11):
