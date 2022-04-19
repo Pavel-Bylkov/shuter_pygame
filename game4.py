@@ -184,14 +184,14 @@ class Boss(Enemy):
         self.reload = time.time()
         self.fire_line = pg.Rect(self.rect.left, self.rect.bottom,
                                  self.rect.right - self.rect.left, win_height)
+        if random.randint(0, 1):
+            self.speed *= -1
 
     def move(self):
-        delta_y = random.randint(-1, 1) * self.speed
-        delta_x = random.randint(-1, 1) * self.speed
-        if 30 < self.rect.y + delta_y < win_height // 2:
-            self.rect.y += delta_y
-        if 30 < self.rect.x + delta_x < win_width - 30:
-            self.rect.x += delta_x
+        if 30 < self.rect.x + self.speed < win_width - 30:
+            self.rect.x += self.speed
+        else:
+            self.speed *= -1
 
     def fire(self):
         if time.time() - self.reload > 0.3:
