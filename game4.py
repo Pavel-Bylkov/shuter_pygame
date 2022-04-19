@@ -344,6 +344,9 @@ class Controller:
                 monster.update_fire()
                 if monster.check_fire(self.hero):
                     monster.fire()
+                coll = pg.sprite.spritecollide(self.hero, monster.bullets, True)
+                for bull in coll:
+                    self.hero.get_hit(bull.power)
             if monster.is_lose():
                 self.hero.get_hit(monster.health)
             if pg.sprite.collide_rect(monster, self.hero):
