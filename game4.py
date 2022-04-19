@@ -183,7 +183,7 @@ class Boss(Enemy):
         self.bullets = pg.sprite.Group()
         self.reload = time.time()
         self.fire_line = pg.Rect(self.rect.left, self.rect.bottom,
-                                 win_height, self.rect.right)
+                                 self.rect.right - self.rect.left, win_height)
 
     def move(self):
         delta_y = random.randint(-1, 1) * self.speed
