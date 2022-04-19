@@ -212,7 +212,7 @@ class Boss(Enemy):
         return self.fire_line.colliderect(hero.rect)
 
     def reset(self, win):
-        pg.draw.rect(win, (250, 200, 230), self.fire_line)
+        # pg.draw.rect(win, (250, 200, 230), self.fire_line)
         self.bullets.draw(win)
 
 
