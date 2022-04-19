@@ -171,20 +171,58 @@ class Enemy(Base):
         self.health_display.update(f"{self.health}")
 
 
-
 class Enemy2(Enemy):
 
     def move(self):
         self.rect.y += self.speed
 
+
+class Boss(Enemy):
+    def __init__(self, x, y, speed, health, img):
+        super().__init__(x, y, speed, health, img)
+        self.bullets = pg.sprite.Group()
+        self.reload = time.time()
+        self.fire_line = pg.Rect(self.rect.left, self.rect.bottom,
+                                 self.rect.right, win_height)
+
+    def move(self):
+        delta_y = random.randint(-1, 1) * self.speed
+        delta_x = random.randint(-1, 1) * self.speed
+        if 30 < self.rect.y + delta_y < win_height // 2:
+            self.rect.y += delta_y
+        if 30 < self.rect.x + delta_x < win_width - 30:
+            self.rect.x += delta_x
+
+    def fire(self):
+        if time.time() - self.reload > 0.15:
+            self.bullets.add(
+                Bullet(x=self.rect.centerx, y=self.rect.bottom, speed=10,
+                       power=1, img=img_bull, direction=0)
+            )
+            self.reload = time.time()
+
+    def update_fire(self):
+        self.fire_line.x = self.rect.x
+
+    def check_fire(self, hero):
+        return self.fire_line.colliderect(hero.rect)
+
+    def reset(self, win):
+        self.bullets.draw(win)
+
+
 class Bullet(Base):
-    def __init__(self, x, y, speed, power, img):
+    def __init__(self, x, y, speed, power, img, direction=1):
         super().__init__(x=x, y=y, speed=speed, img=img)
         self.power = power
+        self.direction = direction
 
     def update(self):
-        self.rect.y -= self.speed
-        if self.rect.y < 0:
+        if self.direction == 1:
+            self.rect.y -= self.speed
+        else:
+            self.rect.y += self.speed
+        if self.rect.y < 0 or self.rect.y > win_height + 50:
             self.kill()
 
 class Bum(pg.sprite.Sprite):
@@ -243,9 +281,9 @@ class Level:
                       y=random.randint(-50, -10),
                       speed=2, health=10, img=img_enemy2)
         elif type == 4:
-            return Enemy2(x=random.randint(3, win_width // 10 - 4) * 10,
-                      y=random.randint(-50, -10),
-                      speed=2, health=12, img=img_enemy4)
+            return Boss(x=random.randint(3, win_width // 10 - 4) * 10,
+                      y=10,
+                      speed=2, health=100, img=img_enemy4)
 
 
 class Controller:
@@ -258,12 +296,12 @@ class Controller:
         self.monsters1 = pg.sprite.Group()
         self.bums = pg.sprite.Group()
         self.levels = [
-            Level(1, {1: 5}),
-            Level(2, {1: 7}),
-            Level(3, {1: 5, 2: 5}),
-            Level(4, {1: 10, 2: 5}),
-            Level(5, {3: 5}),
-            Level(6, {3: 5, 4: 3})
+            # Level(1, {1: 5}),
+            # Level(2, {1: 7}),
+            # Level(3, {1: 5, 2: 5}),
+            # Level(4, {1: 10, 2: 5}),
+            Level(5, {3: 5, 4: 1}),
+            Level(6, {3: 10, 4: 1})
         ]
         self.cur_level = self.levels.pop(0)
         self.timer = time.time()
@@ -283,6 +321,7 @@ class Controller:
         self.monsters1.draw(self.window)
         for monster in self.monsters1:
             monster.health_draw(self.window)
+            monster.reset(self.window)
         self.level_display.reset(self.window)
         self.coins_display.reset(self.window)
         if self.pause:
@@ -296,6 +335,10 @@ class Controller:
     def monsters_update(self):
         for monster in self.monsters1:
             monster.update()
+            if isinstance(monster, Boss):
+                monster.update_fire()
+                if monster.check_fire(self.hero):
+                    monster.fire()
             if monster.is_lose():
                 self.hero.get_hit(monster.health)
             if pg.sprite.collide_rect(monster, self.hero):
