@@ -183,7 +183,7 @@ class Boss(Enemy):
         self.bullets = pg.sprite.Group()
         self.reload = time.time()
         self.fire_line = pg.Rect(self.rect.left, self.rect.bottom,
-                                 self.rect.right, win_height)
+                                 win_height, self.rect.right)
 
     def move(self):
         delta_y = random.randint(-1, 1) * self.speed
@@ -194,20 +194,25 @@ class Boss(Enemy):
             self.rect.x += delta_x
 
     def fire(self):
-        if time.time() - self.reload > 0.15:
+        if time.time() - self.reload > 0.3:
             self.bullets.add(
                 Bullet(x=self.rect.centerx, y=self.rect.bottom, speed=10,
-                       power=1, img=img_bull, direction=0)
+                       power=5, img=img_bull, direction=0)
             )
             self.reload = time.time()
 
     def update_fire(self):
         self.fire_line.x = self.rect.x
 
+    def update(self):
+        super().update()
+        self.bullets.update()
+
     def check_fire(self, hero):
         return self.fire_line.colliderect(hero.rect)
 
     def reset(self, win):
+        pg.draw.rect(win, (250, 200, 230), self.fire_line)
         self.bullets.draw(win)
 
 
