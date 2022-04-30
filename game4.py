@@ -192,6 +192,7 @@ class Boss(Enemy):
             self.rect.x += self.speed
         else:
             self.speed *= -1
+        self.rect.y += 1
 
     def fire(self):
         if time.time() - self.reload > 0.3:
