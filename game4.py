@@ -1,3 +1,4 @@
+#!./venv/bin/python3
 import pygame as pg
 import random
 import time
@@ -186,13 +187,17 @@ class Boss(Enemy):
                                  self.rect.right - self.rect.left, win_height)
         if random.randint(0, 1):
             self.speed *= -1
+        self.fps = 0
 
     def move(self):
         if 30 < self.rect.x + self.speed < win_width - 30:
             self.rect.x += self.speed
         else:
             self.speed *= -1
-        self.rect.y += 1
+        if self.fps // 5 == 1:
+            self.rect.y += 1
+            self.fps = 0
+        self.fps += 1
 
     def fire(self):
         if time.time() - self.reload > 0.3:
