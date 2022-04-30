@@ -179,7 +179,7 @@ class Enemy2(Enemy):
 
 
 class Boss(Enemy):
-    def __init__(self, x, y, speed, health, img):
+    def __init__(self, x, y, speed, health, img, power):
         super().__init__(x, y, speed, health, img)
         self.bullets = pg.sprite.Group()
         self.reload = time.time()
@@ -188,6 +188,7 @@ class Boss(Enemy):
         if random.randint(0, 1):
             self.speed *= -1
         self.fps = 0
+        self.power = power
 
     def move(self):
         if 30 < self.rect.x + self.speed < win_width - 30:
@@ -203,7 +204,7 @@ class Boss(Enemy):
         if time.time() - self.reload > 0.3:
             self.bullets.add(
                 Bullet(x=self.rect.centerx, y=self.rect.bottom, speed=10,
-                       power=5, img=img_bull, direction=0)
+                       power=self.power, img=img_bull, direction=0)
             )
             self.reload = time.time()
 
@@ -294,7 +295,11 @@ class Level:
         elif type == 4:
             return Boss(x=random.randint(3, win_width // 10 - 4) * 10,
                       y=10,
-                      speed=2, health=100, img=img_enemy4)
+                      speed=2, health=50, img=img_enemy4, power=3)
+        elif type == 5:
+            return Boss(x=random.randint(3, win_width // 10 - 4) * 10,
+                      y=10,
+                      speed=2, health=100, img=img_enemy4, power=5)
 
 
 class Controller:
@@ -307,12 +312,12 @@ class Controller:
         self.monsters1 = pg.sprite.Group()
         self.bums = pg.sprite.Group()
         self.levels = [
-            # Level(1, {1: 5}),
-            # Level(2, {1: 7}),
-            # Level(3, {1: 5, 2: 5}),
-            # Level(4, {1: 10, 2: 5}),
+            Level(1, {1: 5}),
+            Level(2, {1: 7}),
+            Level(3, {1: 5, 2: 5}),
+            Level(4, {1: 10, 2: 5}),
             Level(5, {3: 5, 4: 1}),
-            Level(6, {3: 10, 4: 1})
+            Level(6, {3: 10, 5: 1})
         ]
         self.cur_level = self.levels.pop(0)
         self.timer = time.time()
