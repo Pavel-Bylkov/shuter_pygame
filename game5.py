@@ -611,11 +611,13 @@ class Sound:
         self.volume += 0.05
         if self.volume > 1:
             self.volume = 1
+        self.set_volume(self.volume)
 
     def down_volume(self):
         self.volume -= 0.05
         if self.volume < 0:
             self.volume = 0
+        self.set_volume(self.volume)
 
     def control(self, key):
         if key == pg.K_p:
