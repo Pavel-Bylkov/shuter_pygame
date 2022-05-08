@@ -36,7 +36,12 @@ class Conf:
     img_bum = "Взрыв4.png"
     music = ("Sound/gamesound.wav", "Sound/cowboy.wav",
              "Sound/happy.wav", "Sound/sample.wav")
-    weapon = ("rocket2.png", (50, 50)), ("rocket3.png", (50, 50))
+    weapon = ("rocket2.png", (60, 60)), ("rocket3.png", (60, 60))
+    sound = {
+        "fire1": "sounds/laser1.wav", "fire2": "sounds/laser4.wav",
+        "lose": "sounds/boom.mp3", "bum": "Sound/point.wav",
+        "change_level": "sounds/upgrade1.wav",
+        "win": "sounds/money.mp3", "gameover": "sounds/gameover1.wav"}
     FPS = 20
 
 
