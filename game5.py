@@ -453,7 +453,7 @@ class Game:
         self.result_display = Text(x=self.width//2, y=self.height//2,
                                    text="WIN", font_size=150, color=GREEN)
 
-    def resize(self):
+    def on_resize(self):
         self.width = self.window.width
         self.height = self.window.height
 
@@ -655,7 +655,7 @@ class Window:
         # если где-то используется этот параметр, то его тоже нужно обновить
         Conf.win_width = self.width
         Conf.win_height = self.height
-        self.game.resize()
+        self.game.on_resize()
 
     def run(self):
         # Основной цикл игры:
