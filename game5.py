@@ -537,7 +537,7 @@ class Menu:
                     sounds.control(event.key)
                     if event.key == pg.K_ESCAPE:
                         play = False
-
+            sounds.update()
             self.draw()
             self.buttons.update(events)
             pg.display.update(self.rect)
@@ -574,6 +574,7 @@ class Sound:
             self.volume = 0.2
             self.current_sound = None
             self.is_playing = False
+            self.timer = time.time()
 
     def add(self, *filenames):
         for filename in filenames:
@@ -628,13 +629,21 @@ class Sound:
                 pg.mixer.unpause()
                 self.is_playing = True
         comand = {pg.K_t: self.stop, pg.K_l: self.play,
-                  pg.K_n: self.play_next, pg.K_UP: self.up_volume,
-                  pg.K_DOWN: self.down_volume}
+                  pg.K_n: self.play_next}
         if key in comand:
             comand[key]()
         comand2 = (pg.K_1, pg.K_2, pg.K_3, pg.K_4)
         if key in comand2:
             self.play(comand2.index(key))
+
+    def update(self):
+        if time.time() - self.timer > 0.1:
+            keys = pg.key.get_pressed()
+            if keys[pg.K_UP]:
+                self.up_volume()
+            elif keys[pg.K_DOWN]:
+                self.down_volume()
+            self.timer = time.time()
 
 
 class Window:
@@ -687,7 +696,7 @@ class Window:
                     sounds.control(e.key)
                     if e.key == pg.K_ESCAPE:
                         self.main_menu.run()
-
+            sounds.update()
             self.game.on_update(events)
             self.game.on_draw()
 
