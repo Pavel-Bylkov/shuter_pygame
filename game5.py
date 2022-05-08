@@ -571,7 +571,7 @@ class Sound:
     def __init__(self):
         if not hasattr(self, 'sounds'):  # чтобы дважды не вызывался конструктор
             self.sounds = []
-            self.volume = 0.5
+            self.volume = 0.2
             self.current_sound = None
             self.is_playing = False
 
@@ -607,6 +607,16 @@ class Sound:
         if self.current_sound is not None:
             self.sounds[self.current_sound].set_volume(self.volume)
 
+    def up_volume(self):
+        self.volume += 0.05
+        if self.volume > 1:
+            self.volume = 1
+
+    def down_volume(self):
+        self.volume -= 0.05
+        if self.volume < 0:
+            self.volume = 0
+
     def control(self, key):
         if key == pg.K_p:
             if self.is_playing:
@@ -615,7 +625,9 @@ class Sound:
             else:
                 pg.mixer.unpause()
                 self.is_playing = True
-        comand = {pg.K_t: self.stop, pg.K_l: self.play, pg.K_n: self.play_next}
+        comand = {pg.K_t: self.stop, pg.K_l: self.play,
+                  pg.K_n: self.play_next, pg.K_UP: self.up_volume,
+                  pg.K_DOWN: self.down_volume}
         if key in comand:
             comand[key]()
         comand2 = (pg.K_1, pg.K_2, pg.K_3, pg.K_4)
