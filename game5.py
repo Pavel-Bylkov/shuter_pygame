@@ -39,7 +39,7 @@ class Conf:
     weapon = ("rocket2.png", (60, 60)), ("rocket3.png", (60, 60))
     weapon_names = ("Rocket", "Stinger")
     sound = {
-        weapon_names[0]: "sounds/laser1.wav", weapon_names[1]: "sounds/laser4.wav",
+        weapon_names[0]: "sounds/laser2.wav", weapon_names[1]: "sounds/laser4.wav",
         "lose": "Sound/point.wav", "bum": "sounds/boom.mp3",
         "change_level": "sounds/upgrade1.wav",
         "win": "sounds/money.mp3", "gameover": "sounds/gameover1.wav"}
@@ -245,7 +245,8 @@ class Boss(Enemy):
         if random.randint(0, 1):
             self.speed *= -1
         self.fps = 0
-        self.weapon = Weapon(name="Rocket", time_reload=0.3, speed=10, power=power,
+        self.weapon = Weapon(name=Conf.weapon_names[0], time_reload=0.3,
+                             speed=10, power=power,
                              volume=1000, img=Images.bulls[0])
 
     def move(self):
@@ -550,6 +551,17 @@ class Menu:
             pg.display.update(self.rect)
             clock.tick(60)
 
+
+class Popup(Menu):
+    def __init__(self, win, filename="",
+                 pos=(Conf.win_width//2, Conf.win_height//2),
+                 size=(Conf.win_width//2, Conf.win_height//2),
+                 fill=(60, 60, 60), title="",
+                 text_color=WHITE):
+        super(Popup, self).__init__(win, filename, pos, size, fill, title,text_color)
+
+    def new_metod(self):
+        pass
 
 class ButtonGroup(list):
     def add(self, button) -> None:
