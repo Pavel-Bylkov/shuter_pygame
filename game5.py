@@ -37,8 +37,9 @@ class Conf:
     music = ("Sound/gamesound.wav", "Sound/cowboy.wav",
              "Sound/happy.wav", "Sound/sample.wav")
     weapon = ("rocket2.png", (60, 60)), ("rocket3.png", (60, 60))
+    weapon_names = ("Rocket", "Stinger")
     sound = {
-        "fire1": "sounds/laser1.wav", "fire2": "sounds/laser4.wav",
+        weapon_names[0]: "sounds/laser1.wav", weapon_names[1]: "sounds/laser4.wav",
         "lose": "sounds/boom.mp3", "bum": "Sound/point.wav",
         "change_level": "sounds/upgrade1.wav",
         "win": "sounds/money.mp3", "gameover": "sounds/gameover1.wav"}
@@ -116,6 +117,7 @@ class Weapon:
         self.reload = time.time()
         self.volume = volume
         self.img = img
+        self.sound = pg.mixer.Sound(Conf.sound[name])
         if mini_img is not None:
             self.mini_img = mini_img
             self.rect = self.mini_img.get_rect(center=(mini_x, mini_y))
@@ -138,6 +140,8 @@ class Weapon:
                         direction=direction)
         self.reload = time.time()
         self.volume -= 1
+        self.sound.set_volume(sounds.volume)
+        self.sound.play()
         return bullet
 
 
@@ -149,10 +153,10 @@ class Hero(Base):
         self.health_display = Text(x=60, y=90, text="Health: 100", font_size=30)
         self.cur_weapon = 0
         self.weapons = (
-            Weapon(name="Rocket", time_reload=0.15, speed=10, power=1, volume=10000,
+            Weapon(name=Conf.weapon_names[0], time_reload=0.15, speed=10, power=1, volume=10000,
                    img=Images.bulls[0], mini_img=Images.weapon[0], mini_x=100,
                    mini_y=Conf.win_height - 100),
-            Weapon(name="Stinger", time_reload=0.5, speed=15, power=4, volume=1000,
+            Weapon(name=Conf.weapon_names[1], time_reload=0.5, speed=15, power=4, volume=1000,
                    img=Images.bulls[1], mini_img=Images.weapon[1], mini_x=100,
                    mini_y=Conf.win_height - 100))
         # 1 - blaster, 2 - fireball
@@ -295,6 +299,9 @@ class Bum(pg.sprite.Sprite):
         self.image = Images.bum[0]
         self.rect = self.image.get_rect(center=(x, y))
         self.count = 0
+        self.sound = pg.mixer.Sound(Conf.sound["bum"])
+        self.sound.set_volume(sounds.volume)
+        self.sound.play()
 
     def update(self):
         self.count += 1
@@ -560,12 +567,12 @@ class ButtonGroup(list):
             button.update(*args, **kwargs)
 
 
-class Sound:
+class Music:
     def __new__(cls):
         """Реализация паттерна 'Сингелтон' - при попытке создать новый объект
         будет возвращаться ссылка на уже созданный"""
         if not hasattr(cls, 'instance'):
-            cls.instance = super(Sound, cls).__new__(cls)
+            cls.instance = super(Music, cls).__new__(cls)
         return cls.instance
 
     def __init__(self):
@@ -704,7 +711,7 @@ class Window:
             clock.tick(Conf.FPS)
 
 
-sounds = Sound()  # создаем сингелтон объект для управления музыкой
+sounds = Music()  # создаем сингелтон объект для управления музыкой
 sounds.add(*Conf.music)
 sounds.play()
 
