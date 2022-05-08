@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5a786112-4f59-443c-acd7-af37810c3b1e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/game5.py" beforeDir="false" afterPath="$PROJECT_DIR$/game5.py" afterDir="false" />
-    </list>
+    <list default="true" id="5a786112-4f59-443c-acd7-af37810c3b1e" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,7 +59,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1651912953316</updated>
-      <workItem from="1651912955677" duration="26175000" />
+      <workItem from="1651912955677" duration="27112000" />
     </task>
     <servers />
   </component>

@@ -40,7 +40,7 @@ class Conf:
     weapon_names = ("Rocket", "Stinger")
     sound = {
         weapon_names[0]: "sounds/laser1.wav", weapon_names[1]: "sounds/laser4.wav",
-        "lose": "sounds/boom.mp3", "bum": "Sound/point.wav",
+        "lose": "Sound/point.wav", "bum": "sounds/boom.mp3",
         "change_level": "sounds/upgrade1.wav",
         "win": "sounds/money.mp3", "gameover": "sounds/gameover1.wav"}
     FPS = 20
