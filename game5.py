@@ -3,6 +3,7 @@ import pygame as pg
 import random
 import time
 import sys
+import math
 
 # todo add give many and pay upgrades
 # todo add store with weapon strangth, firrate, restore HP
@@ -107,6 +108,42 @@ class Base(pg.sprite.Sprite):
         win.blit(self.image, self.rect)
 
 
+class StatusBar:
+    def __init__(self, center_x, center_y, width=50, height=10, max_value=100):
+        self.color = GREEN
+        self.text = Text(text=f" {max_value}", color=self.color,
+                         x=center_x, y=center_y, font_size=height+2)
+        self.rect = pg.Rect(center_x - width//2, center_y - height//2,
+                            width - self.text.rect.width, height)
+        self.max_value = max_value
+        self.cur_value = max_value
+        self.text.rect.left = self.rect.right
+
+    def correct_pos(self, left, center_y):
+        self.rect.centery = center_y
+        self.rect.left = left
+        self.text.rect.left = self.rect.right
+        self.text.rect.centery = center_y
+
+    def update(self, new_value):
+        self.cur_value = new_value
+        self.color = GREEN if self.cur_value / self.max_value > 0.2 else RED
+        self.text.update(f" {new_value}")
+        self.text.change_color(self.color)
+
+    def draw(self, win):
+        pg.draw.rect(win, self.color, self.rect, width=1)
+        rect = pg.Rect(self.rect.x, self.rect.y,
+                       self.rect.width//10, self.rect.height)
+        start_x = self.rect.x
+        for i in range(math.ceil(self.cur_value / self.max_value * 10)):
+            rect.x = start_x + self.rect.width//10 * i
+            pg.draw.rect(win, self.color, rect)
+        self.text.reset(win)
+
+
+
+
 class Weapon:
     def __init__(self, name, time_reload, speed, power, volume, img,
                  mini_img=None, mini_x=0, mini_y=0):
@@ -122,17 +159,20 @@ class Weapon:
             self.mini_img = mini_img
             self.rect = self.mini_img.get_rect(center=(mini_x, mini_y))
             self.name.change_pos(self.rect.centerx, self.rect.top)
-            self.display_volume = Text(text=f"{volume}", font_size=20,
-                                       x=self.rect.centerx, y=self.rect.bottom)
+            self.display_volume = StatusBar(self.rect.centerx, self.rect.bottom,
+                                            width=self.name.rect.width, height=20,
+                                            max_value=volume)
 
     def draw(self, win):
         if self.mini_img is not None:
             win.blit(self.mini_img, self.rect)
             self.name.reset(win)
-            self.display_volume.update(f"{self.volume}")
-            self.display_volume.reset(win)
+            self.display_volume.update(self.volume)
+            self.display_volume.draw(win)
 
     def reloaded(self):
+        if self.volume == 0:
+            return False
         return time.time() - self.reload > self.time_for_reload
 
     def fire(self, x, y, direction=1):
@@ -150,15 +190,18 @@ class Hero(Base):
         super().__init__(x=x, y=y, speed=speed, img=Images.hero)
         self.bullets = pg.sprite.Group()
         self.health = 100
-        self.health_display = Text(x=60, y=90, text="Health: 100", font_size=30)
+        self.health_display = Text(x=Conf.win_width - 155, y=20, text="Health:", font_size=30)
+        self.health_bar = StatusBar(0, 0, Conf.win_width-self.health_display.rect.right-10,
+                                    height=20, max_value=self.health)
+        self.health_bar.correct_pos(self.health_display.rect.right+5, self.health_display.rect.centery)
         self.cur_weapon = 0
         self.weapons = (
-            Weapon(name=Conf.weapon_names[0], time_reload=0.15, speed=10, power=1, volume=10000,
-                   img=Images.bulls[0], mini_img=Images.weapon[0], mini_x=100,
-                   mini_y=Conf.win_height - 100),
-            Weapon(name=Conf.weapon_names[1], time_reload=0.5, speed=15, power=4, volume=1000,
-                   img=Images.bulls[1], mini_img=Images.weapon[1], mini_x=100,
-                   mini_y=Conf.win_height - 100))
+            Weapon(name=Conf.weapon_names[0], time_reload=0.15, speed=10, power=1, volume=900,
+                   img=Images.bulls[0], mini_img=Images.weapon[0], mini_x=Conf.win_width - 100,
+                   mini_y=80),
+            Weapon(name=Conf.weapon_names[1], time_reload=0.5, speed=15, power=4, volume=300,
+                   img=Images.bulls[1], mini_img=Images.weapon[1], mini_x=Conf.win_width - 100,
+                   mini_y=80))
         # 1 - blaster, 2 - fireball
 
     def change_weapon(self):
@@ -175,7 +218,7 @@ class Hero(Base):
 
     def update(self, events):
         self.bullets.update()
-        self.health_display.update(f"Health: {self.health}")
+        self.health_bar.update(self.health)
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
             self.rect.y -= self.speed
@@ -201,6 +244,7 @@ class Hero(Base):
         super().reset(win)
         self.bullets.draw(win)
         self.health_display.reset(win)
+        self.health_bar.draw(win)
         self.weapons[self.cur_weapon].draw(win)
 
 
@@ -230,6 +274,9 @@ class Enemy(Base):
         self.health_display.change_pos(x=self.rect.centerx, y=(self.rect.top-15))
         self.health_display.update(f"{self.health}")
 
+    def is_dead(self):
+        return self.health <= 0
+
 
 class Enemy2(Enemy):
     def move(self):
@@ -248,6 +295,10 @@ class Boss(Enemy):
         self.weapon = Weapon(name=Conf.weapon_names[0], time_reload=0.3,
                              speed=10, power=power,
                              volume=1000, img=Images.bulls[0])
+        self.left_radar = pg.Rect(self.rect.left-50, self.rect.bottom,
+                                 50, Conf.win_height)
+        self.right_radar = pg.Rect(self.rect.right+50, self.rect.bottom,
+                                  50, Conf.win_height)
 
     def move(self):
         if 30 < self.rect.x + self.speed < Conf.win_width - 30:
@@ -265,7 +316,15 @@ class Boss(Enemy):
                                               y=self.rect.bottom, direction=0))
 
     def update_fire(self):
-        self.fire_line.x = self.rect.x
+        self.fire_line.centerx = self.rect.centerx
+        self.left_radar.right = self.rect.left
+        self.right_radar.left = self.rect.right
+
+    def change_move(self, hero):
+        if self.speed < 0 and self.right_radar.colliderect(hero.rect):
+            self.speed *= -1
+        if self.speed > 0 and self.left_radar.colliderect(hero.rect):
+            self.speed *= -1
 
     def update(self):
         super().update()
@@ -276,6 +335,8 @@ class Boss(Enemy):
 
     def reset(self, win):
         # pg.draw.rect(win, (250, 200, 230), self.fire_line)
+        # pg.draw.rect(win, (50, 200, 30), self.left_radar)
+        # pg.draw.rect(win, (50, 20, 230), self.right_radar)
         self.bullets.draw(win)
 
 
@@ -292,6 +353,12 @@ class Bullet(Base):
             self.rect.y += self.speed
         if self.rect.y < 0 or self.rect.y > Conf.win_height + 50:
             self.kill()
+
+    @staticmethod
+    def bullet_collide(sprite, bull_group):
+        coll = pg.sprite.spritecollide(sprite, bull_group, True)
+        for bull in coll:
+            sprite.health -= bull.power
 
 
 class Bum(pg.sprite.Sprite):
@@ -402,21 +469,18 @@ class Game:
         for monster in self.monsters1:
             monster.update()
             if isinstance(monster, Boss):
+                monster.change_move(self.hero)
                 monster.update_fire()
                 if monster.check_fire(self.hero):
                     monster.fire()
-                coll = pg.sprite.spritecollide(self.hero, monster.bullets, True)
-                for bull in coll:
-                    self.hero.get_hit(bull.power)
+                Bullet.bullet_collide(self.hero, monster.bullets)
             if monster.is_lose():
                 self.hero.get_hit(monster.health)
             if pg.sprite.collide_rect(monster, self.hero):
                 self.hero.get_hit(monster.health)
                 monster.health = 0
-            coll = pg.sprite.spritecollide(monster, self.hero.bullets, True)
-            for bull in coll:
-                monster.health -= bull.power
-            if monster.health <= 0:
+            Bullet.bullet_collide(monster, self.hero.bullets)
+            if monster.is_dead():
                 self.bums.add(
                     Bum(monster.rect.centerx, monster.rect.centery)
                 )
@@ -594,6 +658,7 @@ class Music:
             self.current_sound = None
             self.is_playing = False
             self.timer = time.time()
+            self.channel = None
 
     def add(self, *filenames):
         for filename in filenames:
@@ -607,7 +672,7 @@ class Music:
     def play_current(self):
         if self.current_sound is not None:
             self.sounds[self.current_sound].set_volume(self.volume)
-            self.sounds[self.current_sound].play(loops=-1)
+            self.channel = self.sounds[self.current_sound].play(loops=-1)
             self.is_playing = True
 
     def play(self, index=0):
@@ -642,10 +707,10 @@ class Music:
     def control(self, key):
         if key == pg.K_p:
             if self.is_playing:
-                pg.mixer.pause()
+                self.channel.pause()
                 self.is_playing = False
             else:
-                pg.mixer.unpause()
+                self.channel.unpause()
                 self.is_playing = True
         comand = {pg.K_t: self.stop, pg.K_l: self.play,
                   pg.K_n: self.play_next}
