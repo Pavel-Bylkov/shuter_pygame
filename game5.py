@@ -142,8 +142,6 @@ class StatusBar:
         self.text.reset(win)
 
 
-
-
 class Weapon:
     def __init__(self, name, time_reload, speed, power, volume, img,
                  mini_img=None, mini_x=0, mini_y=0):
@@ -180,7 +178,7 @@ class Weapon:
                         direction=direction)
         self.reload = time.time()
         self.volume -= 1
-        self.sound.set_volume(sounds.volume)
+        self.sound.set_volume(sounds.volume - 0.2)
         self.sound.play()
         return bullet
 
