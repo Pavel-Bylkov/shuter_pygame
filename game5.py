@@ -194,7 +194,7 @@ class Weapon:
                         direction=direction)
         self.reload = time.time()
         self.volume -= 1
-        self.sound.set_volume(sounds.volume - 0.2)
+        self.sound.set_volume(sounds.volume /4)
         self.sound.play()
         return bullet
 
