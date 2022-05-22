@@ -79,12 +79,14 @@ class Text:
         self.color = color
         self.image = self.font.render(text, True, self.color)
         self.rect = self.image.get_rect(center=(x, y))
+        self.active = True
 
     def update(self, text):
-        x = self.rect.centerx
-        y = self.rect.centery
-        self.image = self.font.render(text, True, self.color)
-        self.rect = self.image.get_rect(center=(x, y))
+        if self.active:
+            x = self.rect.centerx
+            y = self.rect.centery
+            self.image = self.font.render(text, True, self.color)
+            self.rect = self.image.get_rect(center=(x, y))
 
     def change_color(self, new_color):
         self.color = new_color
@@ -99,7 +101,14 @@ class Text:
         self.font.set_bold(value)
 
     def reset(self, win):
-        win.blit(self.image, self.rect)
+        if self.active:
+            win.blit(self.image, self.rect)
+
+    def hide(self):
+        self.active = False
+
+    def show(self):
+        self.active = True
 
 
 class Group(list):
@@ -550,7 +559,7 @@ class Button:
                  pos=(Conf.win_width//2, Conf.win_height//2),
                  size=(Conf.win_width//4, Conf.win_height//10),
                  on_click=(lambda: None), text="",
-                 text_color=Color.WHITE, fill=(0, 0, 0)):
+                 text_color=Color.WHITE, fill=(0, 0, 0), active=True):
         self.image = None
         if filename:
             menu = pg.image.load(filename)  # загрузка картинок для меню
@@ -563,19 +572,28 @@ class Button:
                          x=self.rect.centerx, y=self.rect.centery)
         self.fill = fill
         self.on_click = on_click
+        self.active = active
 
-    def draw(self, win):
-        if self.image is None:
-            pg.draw.rect(win, self.fill, self.rect)
-        else:
-            win.blit(self.image, self.rect)
-        self.text.reset(win)
+    def hide(self):
+        self.active = False
+
+    def show(self):
+        self.active = True
+
+    def reset(self, win):
+        if self.active:
+            if self.image is None:
+                pg.draw.rect(win, self.fill, self.rect)
+            else:
+                win.blit(self.image, self.rect)
+            self.text.reset(win)
 
     def update(self, events):
-        for event in events:
-            if event.type == pg.MOUSEBUTTONDOWN:
-                if event.button == 1 and self.rect.collidepoint(*event.pos):
-                    self.on_click()
+        if self.active:
+            for event in events:
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if event.button == 1 and self.rect.collidepoint(*event.pos):
+                        self.on_click()
 
 
 class Menu:
@@ -613,7 +631,7 @@ class Menu:
         else:
             self.win.blit(self.image, self.rect)
         self.title.reset(self.win)
-        self.buttons.draw(self.win)
+        self.buttons.reset(self.win)
         self.text.reset(self.win)
 
     def run(self):
@@ -645,6 +663,7 @@ class SubMenu(Menu):
         self.surfaces = []
         self.colors = []
         self.cur_surface = None
+        self.collect_widgets = ButtonGroup()
         for i, chapter in enumerate(chapters):
             color = Color.random()
             self.surfaces.append(pg.Surface(size))
@@ -658,12 +677,19 @@ class SubMenu(Menu):
             )
             self.cur_surface = i
             self.colors.append(color)
+            self.collect_widgets.append(ButtonGroup())
 
     def change_surface(self, i):
+        self.collect_widgets.hide()
         self.cur_surface = i
+        self.collect_widgets[self.cur_surface].show()
 
     def add_button(self, button):
         self.buttons.add(button)
+
+    def add_widget_to(self, widget, id):
+        widget.hide()
+        self.collect_widgets[id].append(widget)
 
     def add_text(self, text):
         self.text.add(text)
@@ -674,21 +700,49 @@ class SubMenu(Menu):
         else:
             self.win.blit(self.image, self.rect)
         self.title.reset(self.win)
-        self.buttons.draw(self.win)
+        self.buttons.reset(self.win)
         self.text.reset(self.win)
+        self.collect_widgets[self.cur_surface].reset(self.win)
+
+    def run(self):
+        play = True
+        clock = pg.time.Clock()
+        while play:
+            events = pg.event.get()
+            for event in events:
+                if event.type == pg.QUIT:
+                    sys.exit()
+                if event.type == pg.KEYDOWN:
+                    sounds.control(event.key)
+                    if event.key == pg.K_ESCAPE:
+                        play = False
+            sounds.update()
+            self.draw()
+            self.buttons.update(events)
+            self.collect_widgets[self.cur_surface].update(events)
+            pg.display.update(self.rect)
+            clock.tick(60)
 
 
 class ButtonGroup(list):
     def add(self, button) -> None:
         super().append(button)
 
-    def draw(self, *args, **kwargs):
+    def reset(self, *args, **kwargs):
         for button in self:
-            button.draw(*args, **kwargs)
+            button.reset(*args, **kwargs)
 
     def update(self, *args, **kwargs):
         for button in self:
             button.update(*args, **kwargs)
+
+    def show(self, *args, **kwargs):
+        for button in self:
+            button.show(*args, **kwargs)
+
+    def hide(self, *args, **kwargs):
+        for button in self:
+            button.hide(*args, **kwargs)
 
 
 class Music:
@@ -807,8 +861,16 @@ class Window:
                                     chapters=['Weapon', 'Repair'],
                                     filename=Conf.upgrade_menu,
                                     title="Upgrade")
+        self.upgrade_menu.add_widget_to(
+            Button(pos=(Conf.win_width // 2, Conf.win_height // 2 - 60),
+                   size=(150, 60), text="Test1", on_click=sys.exit,
+                   text_color=Color.WHITE, fill=(50, 200, 50)), 0)
+        self.upgrade_menu.add_widget_to(
+            Button(pos=(Conf.win_width // 2, Conf.win_height // 2),
+                   size=(150, 60), text="Test2", on_click=sys.exit,
+                   text_color=Color.WHITE, fill=(50, 200, 50)), 1)
         self.upgrade_menu.add_button(
-            Button(pos=(Conf.win_width // 2, Conf.win_height // 2 + 60),
+            Button(pos=(Conf.win_width // 2, Conf.win_height // 2+100),
                    size=(150, 60), text="Quit", on_click=sys.exit,
                    text_color=Color.WHITE, fill=(50, 200, 50)))
 
