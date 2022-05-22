@@ -45,6 +45,7 @@ class Conf:
         "change_level": "sounds/upgrade1.wav",
         "win": "sounds/money.mp3", "gameover": "sounds/gameover1.wav"}
     FPS = 20
+    upgrade_menu = "dogan-karakus-hud-1.jpg"
 
 
 class Images:
@@ -586,7 +587,7 @@ class Menu:
         self.win = win
         self.image = None
         if filename:
-            menu = pg.image.load(filename)  # загрузка картинок для меню
+            menu = pg.image.load(filename).convert()  # загрузка картинок для меню
             self.image = pg.transform.scale(menu, size)  # изменение размера
             self.rect = self.image.get_rect(center=pos)
         else:
@@ -637,7 +638,7 @@ class Menu:
 class SubMenu(Menu):
     def __init__(self, win, chapters, filename="",
                  pos=(Conf.win_width//2, Conf.win_height//2),
-                 size=(Conf.win_width//2, Conf.win_height//2),
+                 size=(Conf.win_width//4*3, Conf.win_height//4*3),
                  fill=(60, 60, 60), title="",
                  text_color=Color.WHITE):
         super().__init__(win, filename, pos, size, fill, title, text_color)
@@ -802,9 +803,10 @@ class Window:
                    pos=(Conf.win_width//2, Conf.win_height//2 + 60),
                    size=(150, 60), text="Quit", on_click=sys.exit,
                    text_color=Color.WHITE, fill=(50, 200, 50)))
-        self.upgrade_menu = Menu(win=self.screen, title="Upgrade", text_color=(250, 250, 250),
-                                 size=(Conf.win_width * 3 // 4, Conf.win_height * 3 // 4),
-                                 fill=(100, 100, 100))
+        self.upgrade_menu = SubMenu(win=self.screen,
+                                    chapters=['Weapon', 'Repair'],
+                                    filename=Conf.upgrade_menu,
+                                    title="Upgrade")
         self.upgrade_menu.add_button(
             Button(pos=(Conf.win_width // 2, Conf.win_height // 2 + 60),
                    size=(150, 60), text="Quit", on_click=sys.exit,
