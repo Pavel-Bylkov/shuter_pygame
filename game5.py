@@ -57,17 +57,21 @@ class Images:
     weapon = [create_img(img, *size) for img, size in Conf.weapon]
 
 
-# цвета
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-YELLOW = (255, 255, 0)
+class Color:
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0, 0)
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
+    YELLOW = (255, 255, 0)
+
+    @staticmethod
+    def random():
+        return (random.randint(50, 250), random.randint(50, 250), random.randint(50, 250))
 
 
 class Text:
-    def __init__(self, x, y, font=None, font_size=50, text="Test", color=WHITE):
+    def __init__(self, x, y, font=None, font_size=50, text="Test", color=Color.WHITE):
         # создаем шрифт
         self.font = pg.font.Font(font, font_size)
         # Картинка из шрифта
@@ -97,6 +101,18 @@ class Text:
         win.blit(self.image, self.rect)
 
 
+class Group(list):
+    def add(self, elem):
+        self.append(elem)
+
+    def update(self, *args, **kwargs):
+        for elem in self:
+            elem.update(*args, **kwargs)
+
+    def reset(self, *args, **kwargs):
+        for elem in self:
+            elem.reset(*args, **kwargs)
+
 class Base(pg.sprite.Sprite):
     def __init__(self, x, y, speed, img, *args, **kwargs):
         super().__init__(*args)
@@ -110,7 +126,7 @@ class Base(pg.sprite.Sprite):
 
 class StatusBar:
     def __init__(self, center_x, center_y, width=50, height=10, max_value=100):
-        self.color = GREEN
+        self.color = Color.GREEN
         self.text = Text(text=f" {max_value}", color=self.color,
                          x=center_x, y=center_y, font_size=height+2)
         self.rect = pg.Rect(center_x - width//2, center_y - height//2,
@@ -127,7 +143,7 @@ class StatusBar:
 
     def update(self, new_value):
         self.cur_value = new_value
-        self.color = GREEN if self.cur_value / self.max_value > 0.2 else RED
+        self.color = Color.GREEN if self.cur_value / self.max_value > 0.2 else Color.RED
         self.text.update(f" {new_value}")
         self.text.change_color(self.color)
 
@@ -458,7 +474,7 @@ class Game:
         if self.pause:
             level_display = Text(x=self.width // 2, y=self.height // 2,
                                  text=f"LEVEL {self.cur_level.number}",
-                                 font_size=150, color=GREEN)
+                                 font_size=150, color=Color.GREEN)
             level_display.reset(self.scr)
         if self.finish:
             self.result_display.reset(self.scr)
@@ -516,12 +532,12 @@ class Game:
     def game_over(self):
         self.finish = True
         self.result_display = Text(x=self.width//2, y=self.height//2,
-                                   text="GAME OVER", font_size=150, color=RED)
+                                   text="GAME OVER", font_size=150, color=Color.RED)
 
     def game_win(self):
         self.finish = True
         self.result_display = Text(x=self.width//2, y=self.height//2,
-                                   text="WIN", font_size=150, color=GREEN)
+                                   text="WIN", font_size=150, color=Color.GREEN)
 
     def on_resize(self):
         self.width = self.window.width
@@ -529,12 +545,11 @@ class Game:
 
 
 class Button:
-    def __init__(self, win, filename="",
+    def __init__(self, filename="",
                  pos=(Conf.win_width//2, Conf.win_height//2),
                  size=(Conf.win_width//4, Conf.win_height//10),
                  on_click=(lambda: None), text="",
-                 text_color=WHITE, fill=(0, 0, 0)):
-        self.win = win
+                 text_color=Color.WHITE, fill=(0, 0, 0)):
         self.image = None
         if filename:
             menu = pg.image.load(filename)  # загрузка картинок для меню
@@ -548,12 +563,12 @@ class Button:
         self.fill = fill
         self.on_click = on_click
 
-    def draw(self):
+    def draw(self, win):
         if self.image is None:
-            pg.draw.rect(self.win, self.fill, self.rect)
+            pg.draw.rect(win, self.fill, self.rect)
         else:
-            self.win.blit(self.image, self.rect)
-        self.text.reset(self.win)
+            win.blit(self.image, self.rect)
+        self.text.reset(win)
 
     def update(self, events):
         for event in events:
@@ -567,7 +582,7 @@ class Menu:
                  pos=(Conf.win_width//2, Conf.win_height//2),
                  size=(Conf.win_width//2, Conf.win_height//2),
                  fill=(60, 60, 60), title="",
-                 text_color=WHITE):
+                 text_color=Color.WHITE):
         self.win = win
         self.image = None
         if filename:
@@ -583,9 +598,13 @@ class Menu:
         self.title.set_italic(True)
         self.title.set_bold(True)
         self.buttons = ButtonGroup()
+        self.text = Group()
 
     def add_button(self, button):
         self.buttons.add(button)
+
+    def add_text(self, text):
+        self.text.add(text)
 
     def draw(self):
         if self.image is None:
@@ -593,7 +612,8 @@ class Menu:
         else:
             self.win.blit(self.image, self.rect)
         self.title.reset(self.win)
-        self.buttons.draw()
+        self.buttons.draw(self.win)
+        self.text.reset(self.win)
 
     def run(self):
         play = True
@@ -614,23 +634,52 @@ class Menu:
             clock.tick(60)
 
 
-class Popup(Menu):
-    def __init__(self, win, filename="",
+class SubMenu(Menu):
+    def __init__(self, win, chapters, filename="",
                  pos=(Conf.win_width//2, Conf.win_height//2),
                  size=(Conf.win_width//2, Conf.win_height//2),
                  fill=(60, 60, 60), title="",
-                 text_color=WHITE):
-        super(Popup, self).__init__(win, filename, pos, size, fill, title,text_color)
+                 text_color=Color.WHITE):
+        super().__init__(win, filename, pos, size, fill, title, text_color)
+        self.surfaces = []
+        self.colors = []
+        self.cur_surface = None
+        for i, chapter in enumerate(chapters):
+            color = Color.random()
+            self.surfaces.append(pg.Surface(size))
+            width_button = size[0]//len(chapters)
+            self.buttons.add(
+                Button(pos=(width_button * i + self.rect.left + width_button//2,
+                            self.rect.top + 100),
+                       size=(width_button, 60), text=chapter,
+                       on_click=lambda: self.change_surface(i),
+                       text_color=Color.BLACK, fill=color)
+            )
+            self.cur_surface = i
+            self.colors.append(color)
 
-    def new_metod(self):
-        pass
+    def change_surface(self, i):
+        self.cur_surface = i
+
+    def add_button(self, button):
+        self.buttons.add(button)
+
+    def add_text(self, text):
+        self.text.add(text)
+
+    def draw(self):
+        if self.image is None:
+            pg.draw.rect(self.win, self.fill, self.rect)
+        else:
+            self.win.blit(self.image, self.rect)
+        self.title.reset(self.win)
+        self.buttons.draw(self.win)
+        self.text.reset(self.win)
+
 
 class ButtonGroup(list):
     def add(self, button) -> None:
-        if isinstance(button, Button):
-            super().append(button)
-        else:
-            raise TypeError("Type must be is Button")
+        super().append(button)
 
     def draw(self, *args, **kwargs):
         for button in self:
@@ -744,15 +793,22 @@ class Window:
         self.menu_settings = Menu(win=self.screen, filename="base_menu.png",
                                   title="Settings", text_color=(0, 0, 0))
         self.main_menu.add_button(
-            Button(win=self.screen, filename="",
+            Button(filename="",
                    pos=(Conf.win_width//2, Conf.win_height//2 - 40),
                    size=(150, 60), text="Settings", on_click=self.menu_settings.run,
-                   text_color=WHITE, fill=(200, 50, 50)))
+                   text_color=Color.WHITE, fill=(200, 50, 50)))
         self.main_menu.add_button(
-            Button(win=self.screen, filename="",
+            Button(filename="",
                    pos=(Conf.win_width//2, Conf.win_height//2 + 60),
                    size=(150, 60), text="Quit", on_click=sys.exit,
-                   text_color=WHITE, fill=(50, 200, 50)))
+                   text_color=Color.WHITE, fill=(50, 200, 50)))
+        self.upgrade_menu = Menu(win=self.screen, title="Upgrade", text_color=(250, 250, 250),
+                                 size=(Conf.win_width * 3 // 4, Conf.win_height * 3 // 4),
+                                 fill=(100, 100, 100))
+        self.upgrade_menu.add_button(
+            Button(pos=(Conf.win_width // 2, Conf.win_height // 2 + 60),
+                   size=(150, 60), text="Quit", on_click=sys.exit,
+                   text_color=Color.WHITE, fill=(50, 200, 50)))
 
     def resize(self):
         self.width = self.screen.get_width()
@@ -778,6 +834,8 @@ class Window:
                     sounds.control(e.key)
                     if e.key == pg.K_ESCAPE:
                         self.main_menu.run()
+                    if e.key == pg.K_u:
+                        self.upgrade_menu.run()
             sounds.update()
             self.game.on_update(events)
             self.game.on_draw()
