@@ -42,7 +42,7 @@ class Conf:
     sound = {
         weapon_names[0]: "sounds/laser2.wav", weapon_names[1]: "sounds/laser4.wav",
         "lose": "Sound/point.wav", "bum": "sounds/boom.mp3",
-        "change_level": "sounds/upgrade1.wav",
+        "change_level": "sounds/upgrade1.wav", "pay": "sounds/cost.mp3",
         "win": "sounds/money.mp3", "gameover": "sounds/gameover1.wav"}
     FPS = 20
     upgrade_menu = "dogan-karakus-hud-1.jpg"
@@ -189,10 +189,13 @@ class Weapon:
                                             max_value=volume)
             self.speed_title = Text(text=f"Speed: {time_reload}", x=mini_x,
                                     y=self.display_volume.rect.bottom+30, font_size=30)
+            self.power_title = Text(text=f"Power: {power}", x=mini_x,
+                                    y=self.display_volume.rect.bottom + 70, font_size=30)
 
     def draw(self, win):
         if self.mini_img is not None:
             self.speed_title.update(f"Speed: {self.time_for_reload}")
+            self.power_title.update(f"Power: {self.power}")
             win.blit(self.mini_img, self.rect)
             self.title.reset(win)
             self.display_volume.update(self.volume)
@@ -481,11 +484,14 @@ class Game:
         self.coins_display = Text(x=55, y=55, text="Coins: 0", font_size=30)
         self.result_display = None
         self.finish = False
+        self.sound_pay = pg.mixer.Sound(Conf.sound["pay"])
 
     def pay_upgrades(self, type_upgrades, choices, name, attr, cost):
         if self.coins - cost < 0:
             return False
         self.coins -= cost
+        self.sound_pay.set_volume(sounds.volume / 2)
+        self.sound_pay.play()
         if type_upgrades == 'weapon':
             if choices == "power":
                 self.hero.upgrade_weapon_power(name, attr)
