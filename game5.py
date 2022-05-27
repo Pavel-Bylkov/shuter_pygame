@@ -201,6 +201,7 @@ class Weapon:
             self.display_volume.update(self.volume)
             self.display_volume.draw(win)
             self.speed_title.reset(win)
+            self.power_title.reset(win)
 
     def reloaded(self):
         if self.volume == 0:
