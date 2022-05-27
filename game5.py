@@ -558,7 +558,7 @@ class Button:
     def __init__(self, filename="",
                  pos=(Conf.win_width//2, Conf.win_height//2),
                  size=(Conf.win_width//4, Conf.win_height//10),
-                 on_click=(lambda: None), text="",
+                 on_click=(lambda: None), text="", attr=None,
                  text_color=Color.WHITE, fill=(0, 0, 0), active=True):
         self.image = None
         if filename:
@@ -573,6 +573,7 @@ class Button:
         self.fill = fill
         self.on_click = on_click
         self.active = active
+        self.attr = attr
 
     def hide(self):
         self.active = False
@@ -593,7 +594,10 @@ class Button:
             for event in events:
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if event.button == 1 and self.rect.collidepoint(*event.pos):
-                        self.on_click()
+                        if self.attr is None:
+                            self.on_click()
+                        else:
+                            self.on_click(self.attr)
 
 
 class Menu:
@@ -618,6 +622,7 @@ class Menu:
         self.title.set_bold(True)
         self.buttons = ButtonGroup()
         self.text = Group()
+        self.play = False
 
     def add_button(self, button):
         self.buttons.add(button)
@@ -635,9 +640,9 @@ class Menu:
         self.text.reset(self.win)
 
     def run(self):
-        play = True
+        self.play = True
         clock = pg.time.Clock()
-        while play:
+        while self.play:
             events = pg.event.get()
             for event in events:
                 if event.type == pg.QUIT:
@@ -645,12 +650,15 @@ class Menu:
                 if event.type == pg.KEYDOWN:
                     sounds.control(event.key)
                     if event.key == pg.K_ESCAPE:
-                        play = False
+                        self.play = False
             sounds.update()
             self.draw()
             self.buttons.update(events)
             pg.display.update(self.rect)
             clock.tick(60)
+
+    def stop(self):
+        self.play = False
 
 
 class SubMenu(Menu):
@@ -671,13 +679,17 @@ class SubMenu(Menu):
             self.buttons.add(
                 Button(pos=(width_button * i + self.rect.left + width_button//2,
                             self.rect.top + 100),
-                       size=(width_button, 60), text=chapter,
-                       on_click=lambda: self.change_surface(i),
+                       size=(width_button, 60), text=chapter, attr=i,
+                       on_click=self.change_surface,
                        text_color=Color.BLACK, fill=color)
             )
             self.cur_surface = i
             self.colors.append(color)
             self.collect_widgets.append(ButtonGroup())
+        self.add_button(
+            Button(pos=(self.rect.centerx, self.rect.bottom - 100),
+                   size=(150, 60), text="Back", on_click=self.stop,
+                   text_color=Color.BLACK, fill=(20, 150, 20)))
 
     def change_surface(self, i):
         self.collect_widgets.hide()
@@ -705,9 +717,9 @@ class SubMenu(Menu):
         self.collect_widgets[self.cur_surface].reset(self.win)
 
     def run(self):
-        play = True
+        self.play = True
         clock = pg.time.Clock()
-        while play:
+        while self.play:
             events = pg.event.get()
             for event in events:
                 if event.type == pg.QUIT:
@@ -715,7 +727,7 @@ class SubMenu(Menu):
                 if event.type == pg.KEYDOWN:
                     sounds.control(event.key)
                     if event.key == pg.K_ESCAPE:
-                        play = False
+                        self.play = False
             sounds.update()
             self.draw()
             self.buttons.update(events)
@@ -864,15 +876,11 @@ class Window:
         self.upgrade_menu.add_widget_to(
             Button(pos=(Conf.win_width // 2, Conf.win_height // 2 - 60),
                    size=(150, 60), text="Test1", on_click=sys.exit,
-                   text_color=Color.WHITE, fill=(50, 200, 50)), 0)
+                   text_color=Color.WHITE, fill=(50, 200, 50)), id=0)
         self.upgrade_menu.add_widget_to(
             Button(pos=(Conf.win_width // 2, Conf.win_height // 2),
                    size=(150, 60), text="Test2", on_click=sys.exit,
-                   text_color=Color.WHITE, fill=(50, 200, 50)), 1)
-        self.upgrade_menu.add_button(
-            Button(pos=(Conf.win_width // 2, Conf.win_height // 2+100),
-                   size=(150, 60), text="Quit", on_click=sys.exit,
-                   text_color=Color.WHITE, fill=(50, 200, 50)))
+                   text_color=Color.WHITE, fill=(50, 200, 50)), id=1)
 
     def resize(self):
         self.width = self.screen.get_width()
