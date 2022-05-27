@@ -81,8 +81,8 @@ class Text:
         self.rect = self.image.get_rect(center=(x, y))
         self.active = True
 
-    def update(self, text):
-        if self.active:
+    def update(self, text, *args, **kwargs):
+        if self.active and isinstance(text, str):
             x = self.rect.centerx
             y = self.rect.centery
             self.image = self.font.render(text, True, self.color)
@@ -227,6 +227,16 @@ class Hero(Base):
                    img=Images.bulls[1], mini_img=Images.weapon[1], mini_x=Conf.win_width - 100,
                    mini_y=80))
         # 1 - blaster, 2 - fireball
+
+    def upgrade_weapon_reload(self, name, new_reload):
+        for weapon in self.weapons:
+            if weapon.name == name:
+                weapon.time_for_reload = new_reload
+
+    def upgrade_weapon_power(self, name, new_power):
+        for weapon in self.weapons:
+            if weapon.name == name:
+                weapon.power = new_power
 
     def change_weapon(self):
         if self.cur_weapon == 0:
@@ -466,6 +476,19 @@ class Game:
         self.result_display = None
         self.finish = False
 
+    def pay_upgrades(self, type_upgrades, choices, name, attr, cost):
+        if self.coins - cost < 0:
+            return False
+        self.coins -= cost
+        if type_upgrades == 'weapon':
+            if choices == "power":
+                self.hero.upgrade_weapon_power(name, attr)
+            if choices == "reload":
+                self.hero.upgrade_weapon_reload(name, attr)
+        if type_upgrades == 'repair':
+            pass
+        return True
+
     def on_show(self):
         """Выполняется один раз при запуске или переключении вида"""
         self.finish = False
@@ -596,6 +619,10 @@ class Button:
                     if event.button == 1 and self.rect.collidepoint(*event.pos):
                         if self.attr is None:
                             self.on_click()
+                        elif isinstance(self.attr, list):
+                            self.on_click(*self.attr)
+                        elif isinstance(self.attr, dict):
+                            self.on_click(**self.attr)
                         else:
                             self.on_click(self.attr)
 
@@ -859,23 +886,36 @@ class Window:
                               title="Main Menu", text_color=(0, 0, 0))
         self.menu_settings = Menu(win=self.screen, filename="base_menu.png",
                                   title="Settings", text_color=(0, 0, 0))
-        self.main_menu.add_button(
-            Button(filename="",
-                   pos=(Conf.win_width//2, Conf.win_height//2 - 40),
-                   size=(150, 60), text="Settings", on_click=self.menu_settings.run,
-                   text_color=Color.WHITE, fill=(200, 50, 50)))
-        self.main_menu.add_button(
-            Button(filename="",
-                   pos=(Conf.win_width//2, Conf.win_height//2 + 60),
-                   size=(150, 60), text="Quit", on_click=sys.exit,
-                   text_color=Color.WHITE, fill=(50, 200, 50)))
         self.upgrade_menu = SubMenu(win=self.screen,
                                     chapters=['Weapon', 'Repair'],
                                     filename=Conf.upgrade_menu,
                                     title="Upgrade")
+        self.config_menu()
+
+    def config_menu(self):
+        # main menu
+        self.main_menu.add_button(
+            Button(filename="",
+                   pos=(Conf.win_width // 2, Conf.win_height // 2 - 40),
+                   size=(150, 60), text="Settings", on_click=self.menu_settings.run,
+                   text_color=Color.WHITE, fill=(200, 50, 50)))
+        self.main_menu.add_button(
+            Button(filename="",
+                   pos=(Conf.win_width // 2, Conf.win_height // 2 + 60),
+                   size=(150, 60), text="Quit", on_click=sys.exit,
+                   text_color=Color.WHITE, fill=(50, 200, 50)))
+        # menu upgrades
         self.upgrade_menu.add_widget_to(
-            Button(pos=(Conf.win_width // 2, Conf.win_height // 2 - 60),
-                   size=(150, 60), text="Test1", on_click=sys.exit,
+            Text(text="Upgrade speed for Stinger - up to 0.3 Cost:100",
+                 x=self.upgrade_menu.rect.centerx,
+                 y=self.upgrade_menu.rect.centery - 50, color=Color.BLACK), id=0)
+        self.upgrade_menu.add_widget_to(
+            Button(pos=(Conf.win_width // 2, Conf.win_height // 2),
+                   size=(150, 60), text="Pay",
+                   attr={"type_upgrades": "weapon",
+                         "choices": "reload", "name": Conf.weapon[1],
+                         "attr": 0.3, "cost": 100},
+                    on_click=self.game.pay_upgrades,
                    text_color=Color.WHITE, fill=(50, 200, 50)), id=0)
         self.upgrade_menu.add_widget_to(
             Button(pos=(Conf.win_width // 2, Conf.win_height // 2),
