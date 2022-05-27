@@ -171,7 +171,8 @@ class StatusBar:
 class Weapon:
     def __init__(self, name, time_reload, speed, power, volume, img,
                  mini_img=None, mini_x=0, mini_y=0):
-        self.name = Text(text=f"Weapon: {name}", x=0, y=0, font_size=30)
+        self.name = name
+        self.title = Text(text=f"Weapon: {name}", x=0, y=0, font_size=30)
         self.time_for_reload = time_reload
         self.speed = speed
         self.power = power
@@ -182,7 +183,7 @@ class Weapon:
         if mini_img is not None:
             self.mini_img = mini_img
             self.rect = self.mini_img.get_rect(center=(mini_x, mini_y))
-            self.name.change_pos(self.rect.centerx, self.rect.top)
+            self.title.change_pos(self.rect.centerx, self.rect.top)
             self.display_volume = StatusBar(self.rect.centerx, self.rect.bottom,
                                             width=self.name.rect.width, height=20,
                                             max_value=volume)
@@ -190,7 +191,7 @@ class Weapon:
     def draw(self, win):
         if self.mini_img is not None:
             win.blit(self.mini_img, self.rect)
-            self.name.reset(win)
+            self.title.reset(win)
             self.display_volume.update(self.volume)
             self.display_volume.draw(win)
 
