@@ -185,7 +185,7 @@ class Weapon:
             self.rect = self.mini_img.get_rect(center=(mini_x, mini_y))
             self.title.change_pos(self.rect.centerx, self.rect.top)
             self.display_volume = StatusBar(self.rect.centerx, self.rect.bottom,
-                                            width=self.name.rect.width, height=20,
+                                            width=self.title.rect.width, height=20,
                                             max_value=volume)
 
     def draw(self, win):
@@ -915,7 +915,7 @@ class Window:
                    size=(150, 60), text="Pay",
                    attr={"type_upgrades": "weapon",
                          "choices": "reload", "name": Conf.weapon[1],
-                         "attr": 0.3, "cost": 100},
+                         "attr": 0.3, "cost": 10},
                     on_click=self.game.pay_upgrades,
                    text_color=Color.WHITE, fill=(50, 200, 50)), id=0)
         self.upgrade_menu.add_widget_to(
