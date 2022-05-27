@@ -187,13 +187,17 @@ class Weapon:
             self.display_volume = StatusBar(self.rect.centerx, self.rect.bottom,
                                             width=self.title.rect.width, height=20,
                                             max_value=volume)
+            self.speed_title = Text(text=f"Speed: {time_reload}", x=mini_x,
+                                    y=self.display_volume.rect.bottom+30, font_size=30)
 
     def draw(self, win):
         if self.mini_img is not None:
+            self.speed_title.update(f"Speed: {self.time_for_reload}")
             win.blit(self.mini_img, self.rect)
             self.title.reset(win)
             self.display_volume.update(self.volume)
             self.display_volume.draw(win)
+            self.speed_title.reset(win)
 
     def reloaded(self):
         if self.volume == 0:
@@ -231,6 +235,7 @@ class Hero(Base):
 
     def upgrade_weapon_reload(self, name, new_reload):
         for weapon in self.weapons:
+            print(weapon.name, name)
             if weapon.name == name:
                 weapon.time_for_reload = new_reload
 
@@ -914,8 +919,8 @@ class Window:
             Button(pos=(Conf.win_width // 2, Conf.win_height // 2),
                    size=(150, 60), text="Pay",
                    attr={"type_upgrades": "weapon",
-                         "choices": "reload", "name": Conf.weapon[1],
-                         "attr": 0.3, "cost": 10},
+                         "choices": "reload", "name": Conf.weapon_names[1],
+                         "attr": 0.3, "cost": 100},
                     on_click=self.game.pay_upgrades,
                    text_color=Color.WHITE, fill=(50, 200, 50)), id=0)
         self.upgrade_menu.add_widget_to(
