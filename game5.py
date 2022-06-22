@@ -41,7 +41,7 @@ class Conf:
     weapon_names = ("Rocket", "Stinger")
     sound = {
         weapon_names[0]: "sounds/laser2.wav", weapon_names[1]: "sounds/laser4.wav",
-        "lose": "Sound/point.wav", "bum": "sounds/boom.mp3",
+        "lose": "Sound/point.wav", "bum": "sounds/explosion1.wav",
         "change_level": "sounds/upgrade1.wav", "pay": "sounds/cost.mp3",
         "win": "sounds/money.mp3", "gameover": "sounds/gameover1.wav"}
     FPS = 20
@@ -621,6 +621,7 @@ class Button:
         if self.active:
             if self.image is None:
                 pg.draw.rect(win, self.fill, self.rect)
+                pg.draw.rect(win, (0, 0, 0), self.rect, 1)
             else:
                 win.blit(self.image, self.rect)
             self.text.reset(win)
@@ -631,13 +632,15 @@ class Button:
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if event.button == 1 and self.rect.collidepoint(*event.pos):
                         if self.attr is None:
-                            self.on_click()
+                            result = self.on_click()
                         elif isinstance(self.attr, list):
-                            self.on_click(*self.attr)
+                            result = self.on_click(*self.attr)
                         elif isinstance(self.attr, dict):
-                            self.on_click(**self.attr)
+                            result = self.on_click(**self.attr)
                         else:
-                            self.on_click(self.attr)
+                            result = self.on_click(self.attr)
+                        if result is not None and not result:
+                            self.fill = (120, 120, 120)
 
 
 class Menu:
@@ -919,12 +922,12 @@ class Window:
                    text_color=Color.WHITE, fill=(50, 200, 50)))
         # menu upgrades
         self.upgrade_menu.add_widget_to(
-            Text(text="Upgrade speed for Stinger - up to 0.3 Cost:100",
+            Text(text=f"Fire speed for {Conf.weapon_names[1]} - 0.5 --> 0.3",
                  x=self.upgrade_menu.rect.centerx,
                  y=self.upgrade_menu.rect.centery - 50, color=Color.BLACK), id=0)
         self.upgrade_menu.add_widget_to(
             Button(pos=(Conf.win_width // 2, Conf.win_height // 2),
-                   size=(150, 60), text="Pay",
+                   size=(150, 60), text="Cost:100",
                    attr={"type_upgrades": "weapon",
                          "choices": "reload", "name": Conf.weapon_names[1],
                          "attr": 0.3, "cost": 100},
