@@ -898,9 +898,9 @@ class Window:
         self.width = width
         self.height = height
         self.game = Game(self)
-        self.main_menu = Menu(win=self.screen, filename="base_menu.png",
+        self.main_menu = Menu(win=self.screen, filename="images/base_menu.png",
                               title="Main Menu", text_color=(0, 0, 0))
-        self.menu_settings = Menu(win=self.screen, filename="base_menu.png",
+        self.menu_settings = Menu(win=self.screen, filename="images/base_menu.png",
                                   title="Settings", text_color=(0, 0, 0))
         self.upgrade_menu = SubMenu(win=self.screen,
                                     chapters=['Weapon', 'Repair'],
