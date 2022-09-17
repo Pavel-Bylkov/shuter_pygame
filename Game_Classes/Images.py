@@ -1,5 +1,5 @@
 import pygame as pg
-import Conf
+import Game_Classes.Conf as Conf
 
 
 def create_img(filename, width, height):

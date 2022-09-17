@@ -1,2 +1,2 @@
-from .Conf import Conf
-from .Images import create_img, Images
+from Game_Classes.Conf import Conf
+from Game_Classes.Images import create_img, Images
