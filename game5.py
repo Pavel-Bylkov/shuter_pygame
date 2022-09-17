@@ -23,7 +23,7 @@ class Conf:
     win_height = 800
     title = "Shooter"
     # фон игры
-    back = "galaxy.jpg"  
+    back = "galaxy.jpg"
     # герой
     hero = "rocket.png"
     hero_size = (60, 80)
