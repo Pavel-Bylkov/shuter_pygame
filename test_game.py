@@ -16,7 +16,7 @@ while run:
     window.fill((30, 200, 50))
     test = 565656 * 345
     pg.display.update()
-
+#hello
     # цикл срабатывает каждую 0.05 секунд
     #time.delay(50)
     clock.tick(60)
