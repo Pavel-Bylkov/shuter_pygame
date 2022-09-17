@@ -5,57 +5,14 @@ import time
 import sys
 import math
 
+from Game_Classes import *
+
 # todo add give many and pay upgrades
 # todo add store with weapon strangth, firrate, restore HP
 
 # запускаем инициализацию pygame - настройка на наше железо
 pg.init()
 pg.font.init()
-
-
-def create_img(filename, width, height):
-    """конвертация любого формата изображений в формат pygame"""
-    return pg.transform.scale(pg.image.load(filename), (width, height))
-
-
-class Conf:
-    win_width = 1200
-    win_height = 800
-    title = "Shooter"
-    # фон игры
-    back = "galaxy.jpg"
-    # герой
-    hero = "rocket.png"
-    hero_size = (60, 80)
-    # враг
-    enemies = (("ufo.png", (70, 50)), ("ship.png", (50, 60)),
-               ("ship_star-wars.png", (50, 60)), ("mandocruiser.png", (60, 80)))
-    gameover = "gameover.jpeg"
-    # пули
-    bulls = ("fire_blue.png", (10, 10)), ("fireball.png", (20, 20))
-    # взрыв
-    img_bum = "Взрыв4.png"
-    music = ("Sound/gamesound.wav", "Sound/cowboy.wav",
-             "Sound/happy.wav", "Sound/sample.wav")
-    weapon = ("rocket2.png", (60, 60)), ("rocket3.png", (60, 60))
-    weapon_names = ("Rocket", "Stinger")
-    sound = {
-        weapon_names[0]: "sounds/laser2.wav", weapon_names[1]: "sounds/laser4.wav",
-        "lose": "Sound/point.wav", "bum": "sounds/explosion1.wav",
-        "change_level": "sounds/upgrade1.wav", "pay": "sounds/cost.mp3",
-        "win": "sounds/money.mp3", "gameover": "sounds/gameover1.wav"}
-    FPS = 20
-    upgrade_menu = "dogan-karakus-hud-1.jpg"
-
-
-class Images:
-    background = create_img(Conf.back, Conf.win_width, Conf.win_height)
-    gameover = create_img(Conf.gameover, Conf.win_width, Conf.win_height)
-    bum = [create_img(Conf.img_bum, i * 10, i * 10) for i in range(1, 11)]
-    hero = create_img(Conf.hero, *Conf.hero_size)
-    enemies = [create_img(img, *size) for img, size in Conf.enemies]
-    bulls = [create_img(img, *size) for img, size in Conf.bulls]
-    weapon = [create_img(img, *size) for img, size in Conf.weapon]
 
 
 class Color:
