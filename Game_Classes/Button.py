@@ -1,3 +1,5 @@
+from Game_Classes import Conf, Color, Text
+import pygame as pg
 class Button:
     def __init__(self, filename="",
                  pos=(Conf.win_width//2, Conf.win_height//2),

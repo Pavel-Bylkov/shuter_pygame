@@ -1,3 +1,6 @@
+from Game_Classes import Menu, Conf, Color,ButtonGroup, Button, sounds
+import sys
+import pygame as pg
 class SubMenu(Menu):
     def __init__(self, win, chapters, filename="",
                  pos=(Conf.win_width//2, Conf.win_height//2),

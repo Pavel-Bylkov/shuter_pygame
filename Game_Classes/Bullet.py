@@ -1,3 +1,5 @@
+from Game_Classes import Base, Conf
+import pygame as pg
 class Bullet(Base):
     def __init__(self, x, y, speed, power, img, direction=1):
         super().__init__(x=x, y=y, speed=speed, img=img)

@@ -1,3 +1,5 @@
+from Game_Classes import Images, Conf, Enemy, Enemy2
+import random
 class Level:
     def __init__(self, number, n_type):
         self.number = number

@@ -1,3 +1,5 @@
+from Game_Classes import Images, Conf, sounds
+import pygame as pg
 class Bum(pg.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()

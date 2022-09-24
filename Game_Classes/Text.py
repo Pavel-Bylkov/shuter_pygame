@@ -1,4 +1,5 @@
 from Game_Classes.Color import Color
+import pygame as pg
 class Text:
     def __init__(self, x, y, font=None, font_size=50, text="Test", color=Color.WHITE):
         # создаем шрифт

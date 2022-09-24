@@ -1,3 +1,6 @@
+from Game_Classes import Weapon, Enemy, Conf, Images
+import random
+import pygame as pg
 class Boss(Enemy):
     def __init__(self, x, y, speed, health, img, power):
         super().__init__(x, y, speed, health, img)

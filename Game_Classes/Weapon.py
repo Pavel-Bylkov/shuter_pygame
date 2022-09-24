@@ -1,5 +1,6 @@
 from Game_Classes import Text, StatusBar, Bullet, Conf, sounds
 import time
+import pygame as pg
 class Weapon:
     def __init__(self, name, time_reload, speed, power, volume, img,
                  mini_img=None, mini_x=0, mini_y=0):

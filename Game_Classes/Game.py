@@ -1,3 +1,5 @@
+from Game_Classes import Hero, Level, Text, Conf, sounds, Images, Color, Boss, Bullet, Bum
+import time, random
 class Game:
     def __init__(self, window):
         self.window = window
