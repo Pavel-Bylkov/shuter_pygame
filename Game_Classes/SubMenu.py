@@ -1,4 +1,9 @@
-from Game_Classes import Menu, Conf, Color,ButtonGroup, Button, sounds
+from Game_Classes.Button import Button
+from Game_Classes.Conf import Conf
+from Game_Classes.Menu import Menu
+from Game_Classes.ButtonGroup import ButtonGroup
+from Game_Classes.Color import Color
+from Game_Classes.Music import sounds
 import sys
 import pygame as pg
 class SubMenu(Menu):

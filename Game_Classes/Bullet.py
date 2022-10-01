@@ -1,4 +1,5 @@
-from Game_Classes import Base, Conf
+from Game_Classes.Base import Base
+from Game_Classes.Conf import Conf
 import pygame as pg
 class Bullet(Base):
     def __init__(self, x, y, speed, power, img, direction=1):

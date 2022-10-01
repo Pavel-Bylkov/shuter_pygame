@@ -1,4 +1,7 @@
-from Game_Classes import Weapon, Enemy, Conf, Images
+from Game_Classes.Conf import Conf
+from Game_Classes.BaseEnemy import Enemy
+from Game_Classes.Weapon import Weapon
+from Game_Classes.Images import Images
 import random
 import pygame as pg
 class Boss(Enemy):

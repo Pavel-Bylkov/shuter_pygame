@@ -1,5 +1,15 @@
-from Game_Classes import Hero, Level, Text, Conf, sounds, Images, Color, Boss, Bullet, Bum
+from Game_Classes.Conf import Conf
+from Game_Classes.Images import Images
+from Game_Classes.Color import Color
+from Game_Classes.Text import Text
+from Game_Classes.Music import sounds
+from Game_Classes.Hero import Hero
+from Game_Classes.Bullet import Bullet
+from Game_Classes.Bum import Bum
+from Game_Classes.Level import Level
+from Game_Classes.BossEnemy import Boss
 import time, random
+import pygame as pg
 class Game:
     def __init__(self, window):
         self.window = window

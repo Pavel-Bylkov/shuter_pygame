@@ -1,4 +1,5 @@
-from Game_Classes import Color, Text
+from Game_Classes.Color import Color
+from Game_Classes.Text import Text
 import pygame as pg
 import math
 class StatusBar:

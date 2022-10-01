@@ -1,4 +1,4 @@
-from Game_Classes import Conf
+from Game_Classes.Conf import Conf
 import pygame as pg
 import time
 class Music:
@@ -86,6 +86,7 @@ class Music:
             elif keys[pg.K_DOWN]:
                 self.down_volume()
             self.timer = time.time()
+pg.init()
 sounds = Music()  # создаем сингелтон объект для управления музыкой
 sounds.add(*Conf.music)
 sounds.play()

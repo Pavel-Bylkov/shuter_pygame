@@ -1,4 +1,6 @@
-from Game_Classes import Images, Conf, sounds
+from Game_Classes.Images import Images
+from Game_Classes.Conf import Conf
+from Game_Classes.Music import sounds
 import pygame as pg
 class Bum(pg.sprite.Sprite):
     def __init__(self, x, y):

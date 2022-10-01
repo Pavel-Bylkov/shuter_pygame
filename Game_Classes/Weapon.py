@@ -1,4 +1,8 @@
-from Game_Classes import Text, StatusBar, Bullet, Conf, sounds
+from Game_Classes.Conf import Conf
+from Game_Classes.Text import Text
+from Game_Classes.Music import sounds
+from Game_Classes.Bullet import Bullet
+from Game_Classes.StatusBar import StatusBar
 import time
 import pygame as pg
 class Weapon:

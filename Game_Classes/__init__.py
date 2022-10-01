@@ -10,7 +10,6 @@ from Game_Classes.Weapon import Weapon
 from Game_Classes.Hero import Hero
 from Game_Classes.Window import Window
 from Game_Classes.BaseEnemy import Enemy
-from Game_Classes.BossEnemy import Enemy
 from Game_Classes.Bullet import Bullet
 from Game_Classes.Bum import Bum
 from Game_Classes.Button import Button
@@ -22,3 +21,4 @@ from Game_Classes.Menu import Menu
 from Game_Classes.Music import Music
 from Game_Classes.StatusBar import StatusBar
 from Game_Classes.SubMenu import SubMenu
+from Game_Classes.BossEnemy import Boss

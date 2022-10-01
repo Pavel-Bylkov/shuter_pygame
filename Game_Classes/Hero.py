@@ -1,4 +1,9 @@
-from Game_Classes import Base, Conf, StatusBar, Text, Images, Weapon
+from Game_Classes.Base import Base
+from Game_Classes.Conf import Conf
+from Game_Classes.StatusBar import StatusBar
+from Game_Classes.Text import Text
+from Game_Classes.Images import Images
+from Game_Classes.Weapon import Weapon
 import pygame as pg
 class Hero(Base):
     def __init__(self, x, y, speed):

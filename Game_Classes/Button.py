@@ -1,4 +1,6 @@
-from Game_Classes import Conf, Color, Text
+from Game_Classes.Conf import Conf
+from Game_Classes.Text import Text
+from Game_Classes.Color import Color
 import pygame as pg
 class Button:
     def __init__(self, filename="",

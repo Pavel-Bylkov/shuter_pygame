@@ -1,4 +1,12 @@
-from Game_Classes import Game, Menu, SubMenu, Conf, Color, Button, Text, sounds
+from Game_Classes.Conf import Conf
+from Game_Classes.Color import Color
+from Game_Classes.Text import Text
+from Game_Classes.Music import sounds
+from Game_Classes.Button import Button
+from Game_Classes.Game import Game
+from Game_Classes.Menu import Menu
+from Game_Classes.SubMenu import SubMenu
+import sys
 import pygame as pg
 class Window:
     def __init__(self, width, height, title, resizable=True) -> None:

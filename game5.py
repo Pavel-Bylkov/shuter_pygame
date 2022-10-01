@@ -11,7 +11,7 @@ from Game_Classes import *
 # todo add store with weapon strangth, firrate, restore HP
 
 # запускаем инициализацию pygame - настройка на наше железо
-pg.init()
+
 pg.font.init()
 
 

@@ -1,4 +1,8 @@
-from Game_Classes import Images, Conf, Enemy, Enemy2
+from Game_Classes.Images import Images
+from Game_Classes.Conf import Conf
+from Game_Classes.BaseEnemy import Enemy
+from Game_Classes.Enemy2 import Enemy2
+from Game_Classes.BossEnemy import Boss
 import random
 class Level:
     def __init__(self, number, n_type):
