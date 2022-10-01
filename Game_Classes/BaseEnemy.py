@@ -1,4 +1,6 @@
-from Game_Classes import Base, Text, Conf
+from Game_Classes.Conf import Conf
+from Game_Classes.Text import Text
+from Game_Classes.Base import Base
 import random
 class Enemy(Base):
     def __init__(self, x, y, speed, health, img):
