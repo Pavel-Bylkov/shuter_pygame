@@ -35,12 +35,12 @@ class Window:
             Button(filename="",
                    pos=(Conf.win_width // 2, Conf.win_height // 2 - 40),
                    size=(150, 60), text="Settings", on_click=self.menu_settings.run,
-                   text_color=Color.WHITE, fill=(200, 50, 50)))
+                   text_color=Color.WHITE, fill_activ=(200, 50, 50), fill_not_activ=(200, 50, 50)))
         self.main_menu.add_button(
             Button(filename="",
                    pos=(Conf.win_width // 2, Conf.win_height // 2 + 60),
                    size=(150, 60), text="Quit", on_click=sys.exit,
-                   text_color=Color.WHITE, fill=(50, 200, 50)))
+                   text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)))
         # menu upgrades
         self.upgrade_menu.add_widget_to(
             Text(text=f"Fire speed for {Conf.weapon_names[1]} - 0.5 --> 0.3",
@@ -53,11 +53,11 @@ class Window:
                          "choices": "reload", "name": Conf.weapon_names[1],
                          "attr": 0.3, "cost": 100},
                     on_click=self.game.pay_upgrades,
-                   text_color=Color.WHITE, fill=(50, 200, 50)), id=0)
+                   text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)), id=0)
         self.upgrade_menu.add_widget_to(
             Button(pos=(Conf.win_width // 2, Conf.win_height // 2),
                    size=(150, 60), text="Test2", on_click=sys.exit,
-                   text_color=Color.WHITE, fill=(50, 200, 50)), id=1)
+                   text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)), id=1)
 
     def resize(self):
         self.width = self.screen.get_width()

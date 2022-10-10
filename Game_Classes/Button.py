@@ -7,7 +7,8 @@ class Button:
                  pos=(Conf.win_width//2, Conf.win_height//2),
                  size=(Conf.win_width//4, Conf.win_height//10),
                  on_click=(lambda: None), text="", attr=None,
-                 text_color=Color.WHITE, fill=(0, 0, 0), active=True):
+                 text_color=Color.WHITE, fill_not_activ=(0, 0, 0),
+                 fill_activ=(60, 60, 60), active=False, visible=True):
         self.image = None
         if filename:
             menu = pg.image.load(filename)  # загрузка картинок для меню
@@ -18,31 +19,40 @@ class Button:
             self.rect.center = pos
         self.text = Text(text=text, color=text_color, font_size=40,
                          x=self.rect.centerx, y=self.rect.centery)
-        self.fill = fill
+        self.fill_not_activ = fill_not_activ
+        self.fill_activ = fill_activ
         self.on_click = on_click
+        self.visible = visible
         self.active = active
         self.attr = attr
 
     def hide(self):
-        self.active = False
+        self.visible = False
 
     def show(self):
-        self.active = True
+        self.visible = True
 
     def reset(self, win):
-        if self.active:
-            if self.image is None:
-                pg.draw.rect(win, self.fill, self.rect)
+        if self.visible:
+            if self.image is None and not self.active:
+                pg.draw.rect(win, self.fill_not_activ, self.rect)
+                pg.draw.rect(win, (0, 0, 0), self.rect, 1)
+            elif self.image is None and self.active:
+                pg.draw.rect(win, self.fill_activ, self.rect)
                 pg.draw.rect(win, (0, 0, 0), self.rect, 1)
             else:
                 win.blit(self.image, self.rect)
             self.text.reset(win)
 
+    def not_active(self):
+        self.active = False
+
     def update(self, events):
-        if self.active:
+        if self.visible:
             for event in events:
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if event.button == 1 and self.rect.collidepoint(*event.pos):
+                        self.active = True
                         if self.attr is None:
                             result = self.on_click()
                         elif isinstance(self.attr, list):
@@ -52,4 +62,4 @@ class Button:
                         else:
                             result = self.on_click(self.attr)
                         if result is not None and not result:
-                            self.fill = (120, 120, 120)
+                            self.fill_not_activ = (120, 120, 120)

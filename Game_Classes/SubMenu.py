@@ -14,12 +14,10 @@ class SubMenu(Menu):
                  text_color=Color.WHITE):
         super().__init__(win, filename, pos, size, fill, title, text_color)
         self.surfaces = []
-        self.colors = []
+        # self.colors = []
         self.cur_surface = None
         self.collect_widgets = ButtonGroup()
-        listcolor = [Conf.option_act, Conf.option_notact]
         for i, chapter in enumerate(chapters):
-            color = listcolor [1]
             self.surfaces.append(pg.Surface(size))
             width_button = size[0]//len(chapters)
             self.buttons.add(
@@ -27,16 +25,18 @@ class SubMenu(Menu):
                             self.rect.top + 100),
                        size=(width_button, 60), text=chapter, attr=i,
                        on_click=self.change_surface,
-                       text_color=Color.BLACK, fill=color)
+                       text_color=Color.BLACK, fill_activ=Conf.option_act,
+                   fill_not_activ=Conf.option_notact)
             )
             self.cur_surface = i
-            self.colors.append(color)
+            # self.colors.append(color)
             self.collect_widgets.append(ButtonGroup())
-
+        self.buttons[0]
         self.add_button(
             Button(pos=(self.rect.centerx, self.rect.bottom - 100),
                    size=(150, 60), text="Back", on_click=self.stop,
-                   text_color=Color.BLACK, fill=(20, 150, 20)))
+                   text_color=Color.BLACK, fill_activ=(20, 150, 20),
+                   fill_not_activ=(20, 150, 20)))
 
     def change_surface(self, i):
         self.collect_widgets.hide()
