@@ -17,8 +17,9 @@ class SubMenu(Menu):
         self.colors = []
         self.cur_surface = None
         self.collect_widgets = ButtonGroup()
+        listcolor = [Conf.option_act, Conf.option_notact]
         for i, chapter in enumerate(chapters):
-            color = Color.random()
+            color = listcolor [1]
             self.surfaces.append(pg.Surface(size))
             width_button = size[0]//len(chapters)
             self.buttons.add(
@@ -31,6 +32,7 @@ class SubMenu(Menu):
             self.cur_surface = i
             self.colors.append(color)
             self.collect_widgets.append(ButtonGroup())
+
         self.add_button(
             Button(pos=(self.rect.centerx, self.rect.bottom - 100),
                    size=(150, 60), text="Back", on_click=self.stop,

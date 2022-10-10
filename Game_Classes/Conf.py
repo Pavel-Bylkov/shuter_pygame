@@ -26,4 +26,6 @@ class Conf:
         "change_level": "sounds/upgrade1.wav", "pay": "sounds/cost.mp3",
         "win": "sounds/money.mp3", "gameover": "sounds/gameover1.wav"}
     FPS = 20
-    upgrade_menu = "images/dogan-karakus-hud-1.jpg"
+    upgrade_menu = "images/futuristicmenuforpy.jpg"
+    option_act = (0, 77, 230)
+    option_notact = (0, 162, 165)
