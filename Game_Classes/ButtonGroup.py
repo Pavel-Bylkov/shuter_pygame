@@ -9,7 +9,7 @@ class ButtonGroup(list):
             button.reset(*args, **kwargs)
 
     def update(self, *args, **kwargs):
-        current_active = None
+        current_active = False
         last_activ = []
         for button in self:
             if isinstance(button, Button):
@@ -18,13 +18,12 @@ class ButtonGroup(list):
                     last_activ.append(button)
                 button.update(*args, **kwargs)
                 if active != button.active:
-                    current_active = button
+                    current_active = True
             else:
                 button.update(*args, **kwargs)
-        if len(last_activ):
+        if len(last_activ) and current_active:
             for button in last_activ:
-                if button is not current_active:
-                    button.not_active()
+                button.not_active()
 
     def show(self, *args, **kwargs):
         for button in self:
