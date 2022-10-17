@@ -10,21 +10,21 @@ class ButtonGroup(list):
 
     def update(self, *args, **kwargs):
         current_active = None
-        last_activ = None
+        last_activ = []
         for button in self:
             if isinstance(button, Button):
                 active = button.active
                 if active:
-                    last_activ = button
-                    current_active = button
+                    last_activ.append(button)
                 button.update(*args, **kwargs)
                 if active != button.active:
                     current_active = button
             else:
                 button.update(*args, **kwargs)
-        for button in self:
-            if isinstance(button, Button) and button is last_activ and button is not current_active:
-                button.not_active()
+        if len(last_activ):
+            for button in last_activ:
+                if button is not current_active:
+                    button.not_active()
 
     def show(self, *args, **kwargs):
         for button in self:

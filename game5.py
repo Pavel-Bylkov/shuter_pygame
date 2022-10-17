@@ -5,6 +5,7 @@ from Game_Classes import *
 
 # todo add give many and pay upgrades
 # todo add store with weapon strangth, firrate, restore HP
+# todo исправить баг с активацией кнопки меню - смена цвета
 
 # запускаем инициализацию pygame - настройка на наше железо
 
