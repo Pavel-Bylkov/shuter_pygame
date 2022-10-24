@@ -42,21 +42,46 @@ class Window:
                    size=(150, 60), text="Quit", on_click=sys.exit,
                    text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)))
         # menu upgrades
+        # Weapuns id=0
+        # weapon 1
         self.upgrade_menu.add_widget_to(
             Text(text=f"Fire speed for {Conf.weapon_names[1]} - 0.5 --> 0.3",
                  x=self.upgrade_menu.rect.centerx,
-                 y=self.upgrade_menu.rect.centery - 50, color=Color.BLACK), id=0)
+                 y=self.upgrade_menu.rect.centery - 100, color=Color.BLACK), id=0)
         self.upgrade_menu.add_widget_to(
-            Button(pos=(Conf.win_width // 2, Conf.win_height // 2),
+            Button(pos=(Conf.win_width // 2, Conf.win_height // 2 - 50),
                    size=(150, 60), text="Cost:100",
                    attr={"type_upgrades": "weapon",
                          "choices": "reload", "name": Conf.weapon_names[1],
                          "attr": 0.3, "cost": 100},
                     on_click=self.game.pay_upgrades,
                    text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)), id=0)
+        # weapon 2
         self.upgrade_menu.add_widget_to(
-            Button(pos=(Conf.win_width // 2, Conf.win_height // 2),
-                   size=(150, 60), text="Test2", on_click=sys.exit,
+            Text(text=f"Fire speed for {Conf.weapon_names[0]} - 0.15 --> 0.1",
+                 x=self.upgrade_menu.rect.centerx,
+                 y=self.upgrade_menu.rect.centery + 30, color=Color.BLACK), id=0)
+        self.upgrade_menu.add_widget_to(
+            Button(pos=(Conf.win_width // 2, Conf.win_height // 2 + 80),
+                   size=(150, 60), text="Cost:75",
+                   attr={"type_upgrades": "weapon",
+                         "choices": "reload", "name": Conf.weapon_names[0],
+                         "attr": 0.1, "cost": 75},
+                   on_click=self.game.pay_upgrades,
+                   text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)), id=0)
+
+        # Repairs id=1
+        self.upgrade_menu.add_widget_to(
+            Text(text=f"Health + 50",
+                 x=self.upgrade_menu.rect.centerx,
+                 y=self.upgrade_menu.rect.centery + 30, color=Color.BLACK), id=1)
+        self.upgrade_menu.add_widget_to(
+            Button(pos=(Conf.win_width // 2, Conf.win_height // 2 + 80),
+                   size=(150, 60), text="Cost:100",
+                   attr={"type_upgrades": "repair",
+                         "choices": "health", "name": "",
+                         "attr": 50, "cost": 100},
+                   on_click=self.game.pay_upgrades,
                    text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)), id=1)
 
     def resize(self):

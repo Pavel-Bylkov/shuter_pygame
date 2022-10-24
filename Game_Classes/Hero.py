@@ -35,6 +35,11 @@ class Hero(Base):
             if weapon.name == name:
                 weapon.power = new_power
 
+    def upgrade_repair_health(self, xp):
+        self.health += xp
+        if self.health > 100:
+            self.health = 100
+
     def change_weapon(self):
         if self.cur_weapon == 0:
             self.cur_weapon = 1

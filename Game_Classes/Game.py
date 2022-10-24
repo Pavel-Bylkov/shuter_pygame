@@ -51,7 +51,8 @@ class Game:
             if choices == "reload":
                 self.hero.upgrade_weapon_reload(name, attr)
         if type_upgrades == 'repair':
-            pass
+            if choices == 'health':
+                self.hero.upgrade_repair_health(attr)
         return True
 
     def on_show(self):
