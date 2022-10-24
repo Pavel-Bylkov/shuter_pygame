@@ -25,6 +25,7 @@ class Button:
         self.visible = visible
         self.active = active
         self.attr = attr
+        self.colors = (fill_not_activ, fill_activ)
 
     def hide(self):
         self.visible = False
@@ -53,6 +54,8 @@ class Button:
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if event.button == 1 and self.rect.collidepoint(*event.pos):
                         self.active = True
+                        # Вызов метода on_click с разными вариантами передаваемых параметров
+                        result = None
                         if self.attr is None:
                             result = self.on_click()
                         elif isinstance(self.attr, list):
@@ -61,5 +64,9 @@ class Button:
                             result = self.on_click(**self.attr)
                         else:
                             result = self.on_click(self.attr)
+                        # Проверяем результат клика - если False - делаем кнопку серой
                         if result is not None and not result:
                             self.fill_not_activ = (120, 120, 120)
+                            self.fill_activ = (120, 120, 120)
+                        else:
+                            self.fill_not_activ, self.fill_activ = self.colors
