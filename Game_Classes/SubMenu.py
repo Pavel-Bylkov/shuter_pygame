@@ -14,7 +14,6 @@ class SubMenu(Menu):
                  text_color=Color.WHITE):
         super().__init__(win, filename, pos, size, fill, title, text_color)
         self.surfaces = []
-        # self.colors = []
         self.cur_surface = None
         self.collect_widgets = ButtonGroup()
         for i, chapter in enumerate(chapters):
@@ -29,9 +28,7 @@ class SubMenu(Menu):
                    fill_not_activ=Conf.option_notact)
             )
             self.cur_surface = i
-            # self.colors.append(color)
             self.collect_widgets.append(ButtonGroup())
-        self.buttons[0]
         self.add_button(
             Button(pos=(self.rect.centerx, self.rect.bottom - 100),
                    size=(150, 60), text="Back", on_click=self.stop,
