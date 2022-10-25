@@ -25,8 +25,12 @@ class Game:
             Level(2, {1: 7}),
             Level(3, {1: 5, 2: 5}),
             Level(4, {1: 10, 2: 5}),
-            Level(5, {3: 5, 4: 1}),
-            Level(6, {3: 10, 5: 1})
+            Level(5, {3: 5}),
+            Level(6, {3: 5, 4: 1}),
+            Level(7, {3: 5, 5: 1}),
+            Level(8, {3: 5, 2: 10, 1: 10}),
+            Level(9, {4: 1, 5: 1, 3: 5}),
+            Level(10, {3: 20, 2: 10, 1: 10})
         ]
         self.cur_level = self.levels.pop(0)
         self.timer = time.time()
