@@ -21,7 +21,7 @@ class Window:
         self.game = Game(self)
         self.main_menu = Menu(win=self.screen, filename="images/base_menu.png",
                               title="Main Menu", text_color=(0, 0, 0))
-        self.menu_settings = Menu(win=self.screen, filename="images/base_menu.png",
+        self.menu_controls = Menu(win=self.screen, filename="images/base_menu.png",
                                   title="Settings", text_color=(0, 0, 0))
         self.upgrade_menu = SubMenu(win=self.screen,
                                     chapters=['Weapon', 'Repair'],
@@ -34,12 +34,21 @@ class Window:
         self.main_menu.add_button(
             Button(filename="",
                    pos=(Conf.win_width // 2, Conf.win_height // 2 - 40),
-                   size=(150, 60), text="Settings", on_click=self.menu_settings.run,
+                   size=(150, 60), text="Settings", on_click=self.menu_controls.run,
                    text_color=Color.WHITE, fill_activ=(200, 50, 50), fill_not_activ=(200, 50, 50)))
         self.main_menu.add_button(
             Button(filename="",
                    pos=(Conf.win_width // 2, Conf.win_height // 2 + 60),
                    size=(150, 60), text="Quit", on_click=sys.exit,
+                   text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)))
+        # menu controls
+        self.menu_controls.add_text(
+            Text(x=Conf.win_width // 2, y=Conf.win_height // 2 - 40,
+                 font=None, font_size=50, text="Test", color=Color.WHITE))
+        self.menu_controls.add_button(
+            Button(filename="",
+                   pos=(Conf.win_width // 2, Conf.win_height // 2 + 60),
+                   size=(150, 60), text="Back", on_click=sys.exit,
                    text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)))
         # menu upgrades
         # Weapuns id=0
