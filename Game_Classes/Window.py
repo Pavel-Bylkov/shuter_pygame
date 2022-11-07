@@ -43,13 +43,34 @@ class Window:
                    text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)))
         # menu controls
         self.menu_controls.add_text(
+            Text(x=Conf.win_width // 2, y=Conf.win_height // 2 - 100,
+                 font=None, font_size=30,
+                 text=
+                     "UP/DOWN ARROWS = VOLUME", color=Color.WHITE))
+        self.menu_controls.add_text(
+            Text(x=Conf.win_width // 2, y=Conf.win_height // 2 - 70,
+                 font=None, font_size=30,
+                 text="W,A,S,D = UP/LEFT/DOWN/RIGHT", color=Color.WHITE))
+        self.menu_controls.add_text(
             Text(x=Conf.win_width // 2, y=Conf.win_height // 2 - 40,
-                 font=None, font_size=50, text="Test", color=Color.WHITE))
-        self.menu_controls.add_button(
-            Button(filename="",
-                   pos=(Conf.win_width // 2, Conf.win_height // 2 + 60),
-                   size=(150, 60), text="Back", on_click=sys.exit,
-                   text_color=Color.WHITE, fill_activ=(50, 200, 50), fill_not_activ=(50, 200, 50)))
+                 font=None, font_size=30,
+                 text="U = UPGRADES", color=Color.WHITE))
+        self.menu_controls.add_text(
+            Text(x=Conf.win_width // 2, y=Conf.win_height // 2 - 10,
+                 font=None, font_size=30,
+                 text="R = CHANGE WEAPON", color=Color.WHITE))
+        self.menu_controls.add_text(
+            Text(x=Conf.win_width // 2, y=Conf.win_height // 2 + 20,
+                 font=None, font_size=30,
+                 text="T = MUTE MUSIC", color=Color.WHITE))
+        self.menu_controls.add_text(
+            Text(x=Conf.win_width // 2, y=Conf.win_height // 2 + 50,
+                 font=None, font_size=30,
+                 text= "UP/DOWN ARROWS = VOLUME", color=Color.WHITE))
+        self.menu_controls.add_text(
+            Text(x=Conf.win_width // 2, y=Conf.win_height // 2 + 80,
+                 font=None, font_size=30,
+                 text="ESC = GO BACK/OPEN MENU", color=Color.WHITE))
         # menu upgrades
         # Weapuns id=0
         # weapon 1

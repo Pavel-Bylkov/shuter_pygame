@@ -19,7 +19,7 @@ class Conf:
     music = ("Sound/gamesound.wav", "Sound/cowboy.wav",
              "Sound/happy.wav", "Sound/sample.wav")
     weapon = ("images/rocket2.png", (60, 60)), ("images/rocket3.png", (60, 60))
-    weapon_names = ("Rocket", "Stinger")
+    weapon_names = ("Bullet", "Fireball")
     sound = {
         weapon_names[0]: "sounds/laser2.wav", weapon_names[1]: "sounds/laser4.wav",
         "lose": "Sound/point.wav", "bum": "sounds/explosion1.wav",
