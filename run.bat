@@ -1,1 +1,1 @@
-python.exe game5.py
+C:\Users\david\Shooter\env\Scripts\python.exe game5.py

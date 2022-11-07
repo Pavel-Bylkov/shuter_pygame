@@ -19,10 +19,10 @@ class Window:
         self.width = width
         self.height = height
         self.game = Game(self)
-        self.main_menu = Menu(win=self.screen, filename="images/base_menu.png",
+        self.main_menu = Menu(win=self.screen, filename="images/futuristicmenuforpy.jpg",
                               title="Main Menu", text_color=(0, 0, 0))
-        self.menu_controls = Menu(win=self.screen, filename="images/base_menu.png",
-                                  title="Settings", text_color=(0, 0, 0))
+        self.menu_controls = Menu(win=self.screen, filename="images/futuristicmenuforpy.jpg",
+                                  title="Controls", text_color=(0, 0, 0))
         self.upgrade_menu = SubMenu(win=self.screen,
                                     chapters=['Weapon', 'Repair'],
                                     filename=Conf.upgrade_menu,
@@ -34,7 +34,7 @@ class Window:
         self.main_menu.add_button(
             Button(filename="",
                    pos=(Conf.win_width // 2, Conf.win_height // 2 - 40),
-                   size=(150, 60), text="Settings", on_click=self.menu_controls.run,
+                   size=(150, 60), text="Controls", on_click=self.menu_controls.run,
                    text_color=Color.WHITE, fill_activ=(200, 50, 50), fill_not_activ=(200, 50, 50)))
         self.main_menu.add_button(
             Button(filename="",
